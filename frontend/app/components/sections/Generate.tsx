@@ -1,9 +1,10 @@
 export default function Generate() {
   return (
-    <div className="h-screen w-screen bg-slate-700">
-      <div className="h-[75%] w-[80%] m-auto">
-        <div className="h-full flex items-center justify-center bg-slate-100">
-          <h1 className="text-white">Hello world!</h1>
+    <div className="h-full w-full">
+      <div className="grid grid-cols-5">
+        <div className=""></div>
+        <div className="bg-white col-span-4">
+          
         </div>
       </div>
     </div>
