@@ -14,7 +14,7 @@ export default function Home() {
       headers: {
         'Content-Type': 'text/plain',
       },
-      body: 'TestFile',
+      body: 'Test File',
     });
 
     const data = await res.json();
@@ -37,7 +37,7 @@ export default function Home() {
     console.log("HERE");
 
     try {
-      const response = await fetch('http://localhost:8000/test', {
+      const response = await fetch('http://localhost:8000/input', {
         method: 'POST',
         body: formData,
       });
