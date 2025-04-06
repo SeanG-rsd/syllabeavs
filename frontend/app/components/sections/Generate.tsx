@@ -379,13 +379,19 @@ export default function Generate() {
                         Status
                       </button>
                     </div>
-                    {currentSyllabus.map((item) => (
+                    {currentSyllabus.map((item, index) => (
+                      <motion.div
+                      initial={{ opacity: 0, y: 40 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.05 }}
+                    >
                       <Assignment
                         taskName={item["task"]}
                         difficulty={item["difficulty"]}
                         dueDate={item["dueDate"]}
                         status={item["status"]}
                       />
+                      </motion.div>
                     ))}
                   </div>
                 )

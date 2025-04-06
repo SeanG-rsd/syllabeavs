@@ -18,6 +18,10 @@ const Assignment: React.FC<AssignmentProps> = ({
     const [stateColor, setStateColor] = useState('text-red-600');
 
     useEffect(() => {
+      setAssignmentState(status);
+    }, [status]);
+
+    useEffect(() => {
         console.log("adlkjfa");
         if (assignmentState == "Not Started") setStateColor("text-red-600");
         else if (assignmentState == "In Progress") setStateColor("text-yellow-600");
