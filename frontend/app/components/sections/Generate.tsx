@@ -314,7 +314,7 @@ export default function Generate() {
                     )
                 )
                 : (
-                  <div className="w-full h-full items-center">
+                  <div className="w-full h-full items-center mt-10">
                     {
                       /* <div className="p-4 flex justify-end">
                   <button className="p-2 pl-4 pr-2 bg-white rounded-lg flex gap-2">

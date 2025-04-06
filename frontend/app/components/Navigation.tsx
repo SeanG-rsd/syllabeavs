@@ -7,6 +7,10 @@ import Signin from "../components/auth/login/index";
 export default function Navigation() {
   const [showSignIn, setShowSignIn] = useState(false);
 
+  const close = () => {
+    setShowSignIn(false);
+  }
+
   return (
     <div className="w-[90%] m-auto">
       <div className="flex justify-between">
@@ -42,15 +46,13 @@ export default function Navigation() {
         </button>
         {showSignIn && (
           <div className="fixed bg-black/50 min-h-screen w-screen z-10 flex justify-center items-center top-0 left-0 text-white">
-            <AnimatePresence>
-              {showSignIn ? (
-                <motion.div
+            <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ scale: 0 }}
                   key="box"
                 >
-                  <Signin />
+                  <Signin close={close}/>
                   <div className="absolute top-2 right-2 hover:scale-105 hover:cursor-pointer transition duration-200">
                     <IoClose
                       onClick={() => setShowSignIn(false)}
@@ -59,8 +61,6 @@ export default function Navigation() {
                     />
                   </div>
                 </motion.div>
-              ) : null}
-            </AnimatePresence>
           </div>
         )}
       </div>

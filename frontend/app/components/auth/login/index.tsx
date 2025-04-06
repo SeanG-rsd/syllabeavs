@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   doSignInWithEmailAndPassword,
@@ -8,8 +8,13 @@ import {
 import { getAuth } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { IoClose } from "react-icons/io5";
+import Navigation from "../../Navigation";
 
-const Login: React.FC = () => {
+interface LoginProps {
+  close: () => void;
+}
+
+const Login: React.FC<LoginProps> = ({ close }) => {
   const [showSignIn, setShowSignIn] = useState(true);
 
   const user = getAuth();
@@ -32,6 +37,8 @@ const Login: React.FC = () => {
       }
     }
   };
+
+  useEffect(() => {if (isSignedIn) close()}, [isSignedIn])
 
   const onGoogleSignIn = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
