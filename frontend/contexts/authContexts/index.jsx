@@ -2,6 +2,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import { auth } from "../../firebase/firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { getUserData } from '../../firebase/auth';
 //import { initializeApp } from "firebase/app";
 
 const AuthContext = React.createContext();
@@ -9,6 +10,21 @@ const AuthContext = React.createContext();
 //use auth hook, so we can use it later
 export function useAuth(){
     return useContext(AuthContext);
+}
+
+async function initializeUser(user){
+    if(user){
+        const userData =await getUserData(user.uid);
+        setCurrentUser({
+            ...user,
+            ...userData
+        });
+        setUserLoggedIn(true);
+    }else{
+        setCurrentUser(null);
+        setUserLoggedIn(false);
+    }
+    setLoading(false);
 }
 
 export function AuthProvider({ children }){
