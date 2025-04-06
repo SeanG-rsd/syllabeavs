@@ -107,7 +107,30 @@ export default function Generate() {
         </div>
         <div className="h-screen col-span-4 p-10">
           <div className="flex justify-center">
-            <h1 className="text-white">There</h1>
+          {currentSyllabus.length === 0
+            ? <input type="file" onChange={parseSyllabus} />
+            : (
+              <div className="w-full">
+                <div className="flex h-20 bg-black">
+                  <p></p>
+                </div>
+                <div className="flex bg-white g-8 p-8 items-center justify-center text-center">
+                  <p className="title w-1/3">Task</p>
+                  <p className="title w-1/6">Difficulty</p>
+                  <p className="title w-1/4">Due Date</p>
+                  <p className="title w-1/4">Status</p>
+                </div>
+                <div className="p-2 bg-gray-600 m-4"></div>
+                {currentSyllabus.map((item) => (
+                  <Assignment 
+                    taskName={item["task"]} 
+                    difficulty={item["difficulty"]} 
+                    dueDate={item["dueDate"]} 
+                    status={item["status"]} 
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
