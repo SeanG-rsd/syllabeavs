@@ -20,7 +20,7 @@ export default function Generate() {
     }
 
     setCurrentClass(currentInput);
-    setInput('');
+    setInput("");
     setShowModal(false);
   };
 
@@ -64,7 +64,7 @@ export default function Generate() {
   return (
     <div className="h-full w-full">
       <div className="grid grid-cols-5">
-        <div className="h-screen bg-[#1E1E1E] col-span-1 p-10">
+        <div className="min-h-screen bg-[#1E1E1E] col-span-1 p-10">
           <div className="flex justify-center">
             <div className="w-[90%] space-y-5 flex flex-col">
               <h1 className="text-start text-white">Your classes</h1>
@@ -76,9 +76,11 @@ export default function Generate() {
                   {name}
                 </button>
               ))}
-              {Object.keys(syllabi).length == 0
-                ? <div />
-                : <div className="w-full bg-white h-1" />}
+              {Object.keys(syllabi).length == 0 ? (
+                <div />
+              ) : (
+                <div className="w-full bg-white h-1" />
+              )}
               <button
                 onClick={() => setShowModal(true)}
                 className="group flex justify-start items-center rounded-lg py-2 px-3 hover:cursor-pointer hover:bg-[#292929]"
@@ -155,82 +157,82 @@ export default function Generate() {
           </div>
         </div>
         <div className="h-screen col-span-4 py-10">
-          <Navigation/>
+          <Navigation />
           <div className="flex justify-center">
-            {Object.keys(syllabi).length != 0
-              ? (currentSyllabus.length === 0
-                ? (
-                  <div className="h-full w-full flex items-center justify-center">
-                    <input
-                      type="file"
-                      onChange={parseSyllabus}
-                      className="hidden"
-                      id="file-upload"
+            {Object.keys(syllabi).length != 0 ? (
+              currentSyllabus.length === 0 ? (
+                <div className="h-full w-full flex items-center justify-center">
+                  <input
+                    type="file"
+                    onChange={parseSyllabus}
+                    className="hidden"
+                    id="file-upload"
+                  />
+                  <label
+                    htmlFor="file-upload"
+                    className="h-full p-24 space-y-10 cursor-pointer border border-dashed border-slate-200 border-spacing-7 rounded-xl"
+                  >
+                    <div className="flex justify-center items-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        className="size-30 text-slate-300"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m6.75 12-3-3m0 0-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+                        />
+                      </svg>
+                    </div>
+                    <p className="text-center text-slate-300 text-xl font-semibold">
+                      Select your syllabus file and watch the magic happen.
+                    </p>
+                  </label>
+                </div>
+              ) : (
+                <div className="w-full">
+                  <div className="p-4 flex justify-end">
+                    <button className="p-2 pl-4 pr-2 bg-white rounded-lg flex gap-2">
+                      <p>Export</p>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        className="size-6"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15M9 12l3 3m0 0 3-3m-3 3V2.25"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                  <div className="w-[90%] m-auto rounded-lg flex items-center justify-center text-center bg-[#1E1E1E] text-white border-slate-300">
+                    <p className="title w-1/3">Task</p>
+                    <p className="title w-1/6">Difficulty</p>
+                    <p className="title w-1/4">Due Date</p>
+                    <p className="title w-1/4">Status</p>
+                  </div>
+                  {currentSyllabus.map((item) => (
+                    <Assignment
+                      taskName={item["task"]}
+                      difficulty={item["difficulty"]}
+                      dueDate={item["dueDate"]}
+                      status={item["status"]}
                     />
-                    <label
-                      htmlFor="file-upload"
-                      className="h-full p-24 space-y-10 cursor-pointer border border-dashed border-slate-200 border-spacing-7 rounded-xl"
-                    >
-                      <div className="flex justify-center items-center">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke-width="1.5"
-                          stroke="currentColor"
-                          className="size-30 text-slate-300"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m6.75 12-3-3m0 0-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
-                          />
-                        </svg>
-                      </div>
-                      <p className="text-center text-slate-300 text-xl font-semibold">
-                        Select your syllabus file and watch the magic happen.
-                      </p>
-                    </label>
-                  </div>
-                )
-                : (
-                  <div className="w-full">
-                    <div className="p-4 flex justify-end">
-                      <button className="p-2 pl-4 pr-2 bg-white rounded-lg flex gap-2">
-                        <p>Export</p>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke-width="1.5"
-                          stroke="currentColor"
-                          className="size-6"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15M9 12l3 3m0 0 3-3m-3 3V2.25"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                    <div className="flex bg-green-500 items-center justify-center text-center border-b-2 border-red-500">
-                      <p className="title w-1/3">Task</p>
-                      <p className="title w-1/6">Difficulty</p>
-                      <p className="title w-1/4">Due Date</p>
-                      <p className="title w-1/4">Status</p>
-                    </div>
-                    {currentSyllabus.map((item) => (
-                      <Assignment
-                        taskName={item["task"]}
-                        difficulty={item["difficulty"]}
-                        dueDate={item["dueDate"]}
-                        status={item["status"]}
-                      />
-                    ))}
-                  </div>
-                ))
-              : <div></div>}
+                  ))}
+                </div>
+              )
+            ) : (
+              <div></div>
+            )}
           </div>
         </div>
       </div>

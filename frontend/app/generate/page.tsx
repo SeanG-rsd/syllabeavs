@@ -49,7 +49,7 @@ export default function Home() {
   };
 
   return (
-    <section className="flex w-screen h-screen bg-[#292929]">
+    <section className="flex min-w-screen min-h-screen bg-[#292929]">
       <Generate />
     </section>
   );
