@@ -1,10 +1,87 @@
+import { useState } from "react";
+import { IoClose } from "react-icons/io5";
+
 export default function Generate() {
+  const [showModal, setShowModal] = useState(false);
   return (
     <div className="h-full w-full">
       <div className="grid grid-cols-5">
-        <div className=""></div>
-        <div className="bg-white col-span-4">
-          
+        <div className="h-screen bg-[#1E1E1E] col-span-1 p-10">
+          <div className="flex justify-center">
+            <div className="w-[90%] space-y-5">
+              <h1 className="text-start text-white">Your classes</h1>
+              <button
+                onClick={() => setShowModal(true)}
+                className="group flex justify-center items-center rounded-lg py-2 px-3 hover:cursor-pointer hover:bg-[#292929]"
+              >
+                <h1 className="text-white">Add a new class</h1>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  className="group-hover:rotate-180 transition duration-200 ml-2 text-white size-4"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 4.5v15m7.5-7.5h-15"
+                  />
+                </svg>
+              </button>
+              {showModal && (
+                <div className="fixed bg-black/50 min-h-screen w-screen z-10 flex justify-center items-center top-0 left-0 text-white">
+                  <div className="bg-[#343434] shadow-xl p-4 relative rounded-lg">
+                    <div className="flex flex-col gap-4 w-[500px]">
+                      <h2 className="text-slate-200 text-xl font-semibold">
+                        Add a new class
+                      </h2>
+                      <div className="relative">
+                        <input className="peer w-full bg-transparent placeholder:text-slate-400 text-slate-200 text-sm border border-slate-400 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-200 hover:border-slate-300 shadow-sm focus:shadow" required />
+                        <label className="absolute cursor-text bg-[#343434] px-1 left-2.5 top-2.5 text-slate-400 text-sm transition-all transform origin-left peer-focus:-top-2 peer-focus:left-2.5 peer-focus:text-xs peer-focus:text-slate-200 peer-focus:scale-90">
+                          Enter name *
+                        </label>
+                      </div>
+                      <div className="flex px-3 mt-4 justify-between">
+                        <div className="text-sm text-slate-500">
+                          <p>Input fields marked with *</p>
+                          <p>are required</p>
+                        </div>
+                        <div className="flex gap-4">
+                          <button className="group bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 rounded-full p-[1.5px] hover:cursor-pointer hover:scale-105 hover:from-yellow-500 hover:to-red-500 transition duration-200">
+                            <div className="h-full w-full flex items-center justify-center py-3 px-5 rounded-full bg-[#292929]">
+                              <h2 className="text-white font-semibold">
+                                Add Class
+                              </h2>
+                            </div>
+                          </button>
+                          <button
+                            onClick={() => setShowModal(false)}
+                            className="bg-gray-500 text-black py-3 px-5 rounded-full font-semibold hover:bg-gray-400 hover:cursor-pointer hover:scale-105 transition duration-200"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="absolute top-2 right-2 hover:scale-105 hover:cursor-pointer transition duration-200">
+                      <IoClose
+                        onClick={() => setShowModal(false)}
+                        size={30}
+                        className="mt-1 mr-1 text-white"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="h-screen col-span-4 p-10">
+          <div className="flex justify-center">
+            <h1 className="text-white">There</h1>
+          </div>
         </div>
       </div>
     </div>
