@@ -40,8 +40,8 @@ const Assignment: React.FC<AssignmentProps> = ({
       <p className="info w-1/3 text-white">{taskName}</p>
       <div className="info flex w-1/6 text-slate-400">{elements}</div>
       <p className="info w-1/4 text-slate-400">{dueDate}</p>
-      <div className="info w-1/4 flex items-center group relative text-slate-400">
-        {assignmentState}
+      <div className="info w-1/4 flex items-center group relative text-slate-400 hover:cursor-pointer">
+        {status}
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
