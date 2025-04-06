@@ -5,7 +5,37 @@ import Assignment from "../assignment";
 
 export default function Generate() {
   const [showModal, setShowModal] = useState(false);
-  const [currentSyllabus, setSyllabus] = useState([]);
+  const [currentSyllabus, setCurrentSyllabus] = useState([]);
+  const [currentClass, setCurrentClass] = useState('');
+  const [currentInput, setInput] = useState('');
+  const [syllabi, setSyllabi] = useState<{ [key: string]: [] }>({});
+
+  const addClass = () => {
+    if (currentInput != '')
+    {
+      setSyllabi((prev) => ({
+      ...prev,
+      [currentInput]: [],
+    }));
+    }
+
+    setCurrentClass(currentInput);
+    setInput('');
+  };
+
+  const updateCurrentSyllabus = (assignment: []) => {
+    syllabi[currentClass] = assignment;
+    setSyllabi(syllabi);
+    setCurrentClass(currentClass);
+    setCurrentSyllabus(assignment);
+    console.log("update syllabi");
+    console.log(assignment.length);
+  }
+
+  const updateCurrentClass = (className: string) => {
+    setCurrentClass(className);
+    setCurrentSyllabus(syllabi[className]);
+  }
 
   const parseSyllabus = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -23,8 +53,8 @@ export default function Generate() {
       });
 
       const data = await response.json();
-      setSyllabus(JSON.parse(data.message));
       console.log(data.message);
+      updateCurrentSyllabus(JSON.parse(data.message));
     } catch (error) {
       console.error("Error uploading file:", error);
     }
@@ -35,8 +65,10 @@ export default function Generate() {
       <div className="grid grid-cols-5">
         <div className="h-screen bg-[#1E1E1E] col-span-1 p-10">
           <div className="flex justify-center">
-            <div className="w-[90%] space-y-5">
+            <div className="w-[90%] space-y-5 flex flex-col">
               <h1 className="text-start text-white">Your classes</h1>
+              {Object.entries(syllabi).map(([className, items]) => (<button onClick={() => updateCurrentClass(className)} className="text-white flex w-full items-center rounded-lg py-2 px-3 hover:cursor-pointer hover:bg-[#292929]">{className}</button>))}
+              {/* {syllabi.length == 0 ? <div/> : <div className="w-full bg-white h-1"/>} */}
               <button
                 onClick={() => setShowModal(true)}
                 className="group flex justify-center items-center rounded-lg py-2 px-3 hover:cursor-pointer hover:bg-[#292929]"
@@ -65,7 +97,7 @@ export default function Generate() {
                         Add a new class
                       </h2>
                       <div className="relative">
-                        <input className="peer w-full bg-transparent placeholder:text-slate-400 text-slate-200 text-sm border border-slate-400 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-200 hover:border-slate-300 shadow-sm focus:shadow" required />
+                        <input onChange={(e) => setInput(e.target.value)} className="peer w-full bg-transparent placeholder:text-slate-400 text-slate-200 text-sm border border-slate-400 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-200 hover:border-slate-300 shadow-sm focus:shadow" required />
                         <label className="absolute cursor-text bg-[#343434] px-1 left-2.5 top-2.5 text-slate-400 text-sm transition-all transform origin-left peer-focus:-top-2 peer-focus:left-2.5 peer-focus:text-xs peer-focus:text-slate-200 peer-focus:scale-90">
                           Enter name *
                         </label>
@@ -76,7 +108,7 @@ export default function Generate() {
                           <p>are required</p>
                         </div>
                         <div className="flex gap-4">
-                          <button className="group bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 rounded-full p-[1.5px] hover:cursor-pointer hover:scale-105 hover:from-yellow-500 hover:to-red-500 transition duration-200">
+                          <button onClick={addClass} className="group bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 rounded-full p-[1.5px] hover:cursor-pointer hover:scale-105 hover:from-yellow-500 hover:to-red-500 transition duration-200">
                             <div className="h-full w-full flex items-center justify-center py-3 px-5 rounded-full bg-[#292929]">
                               <h2 className="text-white font-semibold">
                                 Add Class
@@ -107,7 +139,8 @@ export default function Generate() {
         </div>
         <div className="h-screen col-span-4 p-10">
           <div className="flex justify-center">
-          {currentSyllabus.length === 0
+          {Object.keys(syllabi).length != 0 ?
+          (currentSyllabus.length === 0
             ? <input type="file" onChange={parseSyllabus} />
             : (
               <div className="w-full">
@@ -130,7 +163,7 @@ export default function Generate() {
                   />
                 ))}
               </div>
-            )}
+            )) : (<div></div>)}
           </div>
         </div>
       </div>
