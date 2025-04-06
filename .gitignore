@@ -19,6 +19,7 @@ dist/
 # /dist
 # /build
 # *.spec
+node_modules/
 
 # VS Code settings (optional, if using VS Code)
 .vscode/
