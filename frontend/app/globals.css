@@ -1,12 +1,35 @@
 @import "tailwindcss";
 
 .info {
-    padding: 4px;
-    background-color: white;
-    text-align: center;
-    border-radius: 12px;
+    padding: 30 0 30 20;
+    text-align: left;
 }
 
 .title {
-    
+    text-align: left;
+    padding: 20px;
+}
+
+hr {
+    border: none;
+    border-top: 0.5px dashed white;
+}
+
+@keyframes shake {
+    0%, 100% {
+      transform: translateX(0);
+    }
+    25% {
+      transform: translateX(-5px);
+    }
+    50% {
+      transform: translateX(5px);
+    }
+    75% {
+      transform: translateX(-5px);
+    }
+  }
+  
+.shake-text {
+    animation: shake 0.5s ease-in-out;
 }
