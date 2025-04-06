@@ -226,13 +226,6 @@ export default function Generate() {
                               </div>
                             </div>
                           </div>
-                          <div className="absolute top-2 right-2 hover:scale-105 hover:cursor-pointer transition duration-200">
-                            <IoClose
-                              onClick={() => setShowModal(false)}
-                              size={30}
-                              className="mt-1 mr-1 text-white"
-                            />
-                          </div>
                         </div>
                       </motion.div>
                     )

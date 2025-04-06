@@ -1,6 +1,12 @@
 import Link from "next/link";
+import { useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { IoClose } from "react-icons/io5";
+import Signin from "../components/auth/login/index";
 
 export default function Navigation() {
+  const [showSignIn, setShowSignIn] = useState(false);
+
   return (
     <div className="w-[90%] m-auto">
       <div className="flex justify-between">
@@ -15,7 +21,10 @@ export default function Navigation() {
             </h1>
           </div>
         </Link>
-        <div className="hover:cursor-pointer">
+        <button
+          className="hover:cursor-pointer"
+          onClick={() => setShowSignIn(true)}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -30,7 +39,30 @@ export default function Navigation() {
               d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
             />
           </svg>
-        </div>
+        </button>
+        {showSignIn && (
+          <div className="fixed bg-black/50 min-h-screen w-screen z-10 flex justify-center items-center top-0 left-0 text-white">
+            <AnimatePresence>
+              {showSignIn ? (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ scale: 0 }}
+                  key="box"
+                >
+                  <Signin />
+                  <div className="absolute top-2 right-2 hover:scale-105 hover:cursor-pointer transition duration-200">
+                    <IoClose
+                      onClick={() => setShowSignIn(false)}
+                      size={30}
+                      className="mt-1 mr-1 text-white"
+                    />
+                  </div>
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
+          </div>
+        )}
       </div>
     </div>
   );
