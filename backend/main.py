@@ -20,7 +20,8 @@ For each of these pieces, find out the the name of the task, the status of the t
 (1 being tasks that take less than 15 minutes to do and 5 being tests or something that takes more than 3 hours), and the due date in the format (mm/dd/yy). 
 Put each individual task in its own line. Include only the columns headers and the information, nothing else, not even quotation marks.
 All tasks can be given 1 of 4 statuses, "Not Started", "In Progress", "Blocked", or "Completed". For this course all tasks will be assigned "Not Started".
-For reference, Monday of Week 1 is 1/6/25 and Sunday of Week 1 is 1/12/25. Do not output any information except for the JSON formatted file. Output into the given JSON format below:
+For reference, Monday of Week 1 is 3/31/25 and Sunday of Week 1 is 4/6/25. The course lasts for 10 weeks, make sure to include every week's assignments
+Do not output any information except for the JSON formatted file. Output into the given JSON format below:
 
 Assignment JSON:
 {
@@ -31,6 +32,7 @@ Assignment JSON:
     "dueDate": string (mm/dd/yyyy)
 }
 
+
 Syllabus JSON:
 [
     Assignment JSON,
@@ -38,12 +40,12 @@ Syllabus JSON:
     ...
 ]
 
+NO QUOTATION MARKS
 """
 
-# Allow React frontend (localhost:3000) to call the API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -88,7 +90,7 @@ def parse_syllabus(text):
                 "role":"user",
                 "content": text
             }
-        ]
+        ],
     )
     return response.choices[0].message.content
 
