@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 interface AssignmentProps {
   taskName: string;
   dueDate: string;
@@ -11,6 +13,8 @@ const Assignment: React.FC<AssignmentProps> = ({
   difficulty,
   status,
 }) => {
+    const [assignmentState, setAssignmentState] = useState(status);
+
   const elements = [];
   for (let i = 0; i < difficulty; i++) {
     elements.push(
@@ -32,12 +36,12 @@ const Assignment: React.FC<AssignmentProps> = ({
   }
 
   return (
-    <div className="w-[90%] m-auto rounded-lg flex items-center justify-center text-center">
+    <div className="m-4 rounded-lg flex items-center justify-center text-center">
       <p className="info w-1/3 text-white">{taskName}</p>
       <div className="info flex w-1/6 text-slate-400">{elements}</div>
       <p className="info w-1/4 text-slate-400">{dueDate}</p>
       <div className="info w-1/4 flex items-center group relative text-slate-400">
-        {status}
+        {assignmentState}
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -56,15 +60,15 @@ const Assignment: React.FC<AssignmentProps> = ({
           className="absolute w-[50%] top-full border border-white bg-[#292929] z-10 grid grid-row-4 rounded-lg p-3 shadow-md
                       space-y-1 scale-y-0 group-hover:scale-y-100 origin-top duration-200"
         >
-          <div className="py-1 px-2 rounded-md flex justify-center text-red-600 hover:bg-slate-700  hover:cursor-pointer transition-all duration-100">
+          <button onClick={() => setAssignmentState("Not Started")} className="py-1 px-2 rounded-md flex justify-center text-red-600 hover:bg-slate-700  hover:cursor-pointer transition-all duration-100">
             Not Started
-          </div>
-          <div className="py-1 px-2 rounded-md flex justify-center text-yellow-600 hover:bg-slate-700 gray-800 hover:cursor-pointer transition-all duration-100">
-            Ongoing
-          </div>
-          <div className="py-1 px-2 rounded-md flex justify-center text-green-600 hover:bg-slate-700 hover:cursor-pointer transition-all duration-100">
+          </button>
+          <button onClick={() => setAssignmentState("In Progress")} className="py-1 px-2 rounded-md flex justify-center text-yellow-600 hover:bg-slate-700 gray-800 hover:cursor-pointer transition-all duration-100">
+            In Progress
+          </button>
+          <button onClick={() => setAssignmentState("Complete")} className="py-1 px-2 rounded-md flex justify-center text-green-600 hover:bg-slate-700 hover:cursor-pointer transition-all duration-100">
             Complete
-          </div>
+          </button>
         </div>
       </div>
     </div>

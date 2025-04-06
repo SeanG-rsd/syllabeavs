@@ -71,9 +71,8 @@ export default function Generate() {
   };
 
   return (
-    <div className="h-full w-full">
-      <div className="grid grid-cols-5">
-        <div className="min-h-screen bg-[#1E1E1E] col-span-1 p-10">
+    <div className="h-full w-full overflow-hidden">
+        <div className="w-72 h-screen bg-[#1E1E1E] col-span-1 p-10 flex-shrink-0 fixed">
           <div className="flex justify-center">
             <div className="w-[90%] space-y-5 flex flex-col">
               <h1 className="text-start text-white">Your classes</h1>
@@ -176,7 +175,7 @@ export default function Generate() {
             </div>
           </div>
         </div>
-        <div className="h-screen col-span-4 py-10">
+        <div className="h-screen col-span-4 py-10 ml-72 overflow-y-auto flex-1">
           <div className="mr-8">
             <Navigation  />
           </div>
@@ -236,7 +235,7 @@ export default function Generate() {
                       </svg>
                     </button>
                   </div>
-                  <div className="w-[90%] m-auto rounded-lg flex items-center justify-center text-center bg-[#1E1E1E] text-white border-slate-300">
+                  <div className="m-4 rounded-lg flex items-center justify-center text-center bg-[#1E1E1E] text-white border-slate-300">
                     <p className="title w-1/3">Task</p>
                     <p className="title w-1/6">Difficulty</p>
                     <p className="title w-1/4">Due Date</p>
@@ -258,6 +257,5 @@ export default function Generate() {
           </div>
         </div>
       </div>
-    </div>
   );
 }
