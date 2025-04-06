@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface AssignmentProps {
   taskName: string;
@@ -14,6 +14,14 @@ const Assignment: React.FC<AssignmentProps> = ({
   status,
 }) => {
     const [assignmentState, setAssignmentState] = useState(status);
+    const [stateColor, setStateColor] = useState('text-red-600');
+
+    useEffect(() => {
+        console.log("adlkjfa");
+        if (assignmentState == "Not Started") setStateColor("text-red-600");
+        else if (assignmentState == "In Progress") setStateColor("text-yellow-600");
+        else if (assignmentState == "Completed") setStateColor("text-green-600"); 
+    }, [assignmentState]);
 
   const elements = [];
   for (let i = 0; i < difficulty; i++) {
@@ -40,14 +48,14 @@ const Assignment: React.FC<AssignmentProps> = ({
       <p className="info w-1/3 text-white">{taskName}</p>
       <div className="info flex w-1/6 text-slate-400">{elements}</div>
       <p className="info w-1/4 text-slate-400">{dueDate}</p>
-      <div className="info w-1/4 flex items-center group relative text-slate-400 hover:cursor-pointer">
-        {status}
+      <div className={`info w-1/4 flex items-center group relative ${stateColor} hover:cursor-pointer`}>
+        {assignmentState}
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
           stroke-width="1.5"
-          stroke="currentColor"
+          stroke="white"
           className="size-4 ml-2 font-semibold group-hover:rotate-180 duration-200"
         >
           <path
