@@ -8,6 +8,7 @@ export default function Generate() {
   const [showModal, setShowModal] = useState(false);
   const [currentSyllabus, setCurrentSyllabus] = useState([]);
   const [currentClass, setCurrentClass] = useState("");
+  const [shake, setShake] = useState(false);
   const [currentInput, setInput] = useState("");
   const [syllabi, setSyllabi] = useState<{ [key: string]: [] }>({});
 
@@ -17,11 +18,19 @@ export default function Generate() {
         ...prev,
         [currentInput]: [],
       }));
-    }
 
-    setCurrentClass(currentInput);
-    setInput('');
-    setShowModal(false);
+      setCurrentClass(currentInput);
+      setInput("");
+      setShowModal(false);
+      setShake(false);
+    }
+    else {
+      setShake(true);
+
+      setTimeout(() => {
+        setShake(false);
+      }, 500);
+    }
   };
 
   const updateCurrentSyllabus = (assignment: []) => {
@@ -69,12 +78,23 @@ export default function Generate() {
             <div className="w-[90%] space-y-5 flex flex-col">
               <h1 className="text-start text-white">Your classes</h1>
               {Object.keys(syllabi).map((name) => (
-                <button
-                  onClick={() => updateCurrentClass(name)}
-                  className="text-white flex w-full items-center rounded-lg py-2 px-3 hover:cursor-pointer hover:bg-[#292929] focus:bg-[#292929]"
-                >
-                  {name}
-                </button>
+                name == currentClass
+                  ? (
+                    <button
+                      onClick={() => updateCurrentClass(name)}
+                      className="text-white flex w-full items-center rounded-lg py-2 px-3 hover:cursor-pointer bg-[#292929]"
+                    >
+                      {name}
+                    </button>
+                  )
+                  : (
+                    <button
+                      onClick={() => updateCurrentClass(name)}
+                      className="text-white flex w-full items-center rounded-lg py-2 px-3 hover:cursor-pointer hover:bg-[#292929]"
+                    >
+                      {name}
+                    </button>
+                  )
               ))}
               {Object.keys(syllabi).length == 0
                 ? <div />
@@ -117,7 +137,7 @@ export default function Generate() {
                         </label>
                       </div>
                       <div className="flex px-3 mt-4 justify-between">
-                        <div className="text-sm text-slate-500">
+                        <div className={`text-sm ${shake ? "text-red-700" : "text-slate-500"} ${shake ? "shake-text" : ""}`}>
                           <p>Input fields marked with *</p>
                           <p>are required</p>
                         </div>
@@ -155,12 +175,14 @@ export default function Generate() {
           </div>
         </div>
         <div className="h-screen col-span-4 py-10">
-          <Navigation/>
-          <div className="flex justify-center">
+          <div className="mr-8">
+            <Navigation />
+          </div>
+          <div className="flex h-full justify-center items-center">
             {Object.keys(syllabi).length != 0
               ? (currentSyllabus.length === 0
                 ? (
-                  <div className="h-full w-full flex items-center justify-center">
+                  <div className="flex h-fit items-center justify-center">
                     <input
                       type="file"
                       onChange={parseSyllabus}
@@ -194,7 +216,7 @@ export default function Generate() {
                   </div>
                 )
                 : (
-                  <div className="w-full">
+                  <div className="w-full h-full items-center">
                     <div className="p-4 flex justify-end">
                       <button className="p-2 pl-4 pr-2 bg-white rounded-lg flex gap-2">
                         <p>Export</p>
