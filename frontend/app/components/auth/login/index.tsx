@@ -11,6 +11,7 @@ const Login: React.FC = () => {
 
     const [email, setEmail] = useState<string>('')
     const [password, setPassword] = useState<string>('')
+    const [isSignedIn, setIsSignedIn] = useState(false)
     const [isSigningIn, setIsSigningIn] = useState<boolean>(false)
     const [errorMessage, setErrorMessage] = useState<string>('')
 
@@ -34,6 +35,9 @@ const Login: React.FC = () => {
             //
             try {
                 await doSignInWithGoogle()
+                console.log("signed in");
+                setIsSigningIn(false)
+                setIsSignedIn(true)
             } catch (err: any) {
                 setErrorMessage(err.message || 'Google sign-in failed.')
                 setIsSigningIn(false)
@@ -43,7 +47,7 @@ const Login: React.FC = () => {
 
     return (
         <div>
-            {!user &&
+            {!isSignedIn &&
             <main className="w-full h-screen flex self-center place-content-center place-items-center">
                 <div className="w-96 text-gray-600 space-y-5 p-4 shadow-xl border rounded-xl">
                     <div className="text-center">

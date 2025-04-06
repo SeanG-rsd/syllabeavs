@@ -20,7 +20,7 @@ const Assignment: React.FC<AssignmentProps> = ({
         console.log("adlkjfa");
         if (assignmentState == "Not Started") setStateColor("text-red-600");
         else if (assignmentState == "In Progress") setStateColor("text-yellow-600");
-        else if (assignmentState == "Completed") setStateColor("text-green-600"); 
+        else if (assignmentState == "Complete") setStateColor("text-green-600"); 
     }, [assignmentState]);
 
   const elements = [];
