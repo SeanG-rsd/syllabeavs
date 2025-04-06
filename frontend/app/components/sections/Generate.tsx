@@ -2,6 +2,7 @@ import { IoClose } from "react-icons/io5";
 
 import { useState } from "react";
 import Assignment from "../assignment";
+import Navigation from "../navigation";
 
 export default function Generate() {
   const [showModal, setShowModal] = useState(false);
@@ -21,6 +22,7 @@ export default function Generate() {
 
     setCurrentClass(currentInput);
     setInput('');
+    setShowModal(false);
   };
 
   const updateCurrentSyllabus = (assignment: []) => {
@@ -68,10 +70,12 @@ export default function Generate() {
             <div className="w-[90%] space-y-5 flex flex-col">
               <h1 className="text-start text-white">Your classes</h1>
               {Object.entries(syllabi).map(([className, items]) => (<button onClick={() => updateCurrentClass(className)} className="text-white flex w-full items-center rounded-lg py-2 px-3 hover:cursor-pointer hover:bg-[#292929]">{className}</button>))}
-              {/* {syllabi.length == 0 ? <div/> : <div className="w-full bg-white h-1"/>} */}
+              {Object.keys(syllabi).length == 0 ? <div/> : (
+                <hr/>
+              )}
               <button
                 onClick={() => setShowModal(true)}
-                className="group flex justify-center items-center rounded-lg py-2 px-3 hover:cursor-pointer hover:bg-[#292929]"
+                className="group flex justify-start items-center rounded-lg py-2 px-3 hover:cursor-pointer hover:bg-[#292929]"
               >
                 <h1 className="text-white">Add a new class</h1>
                 <svg
@@ -137,7 +141,8 @@ export default function Generate() {
             </div>
           </div>
         </div>
-        <div className="h-screen col-span-4 p-10">
+        <div className="h-screen col-span-4 px-5 py-24">
+          <Navigation/>
           <div className="flex justify-center">
           {Object.keys(syllabi).length != 0 ?
           (currentSyllabus.length === 0
