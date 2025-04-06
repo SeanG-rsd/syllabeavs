@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import Generate from "../components/sections/Generate";
+import Navigation from "../components/Navigation";
 
 export default function Home() {
   const [response, setResponse] = useState("");
