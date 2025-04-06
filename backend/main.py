@@ -28,7 +28,7 @@ Assignment JSON:
     "status": string ("Not Started", "In Progress", or "Completed"),
     "class": string,
     "difficulty": int (1-5),
-    "due date": string (mm/dd/yyyy)
+    "dueDate": string (mm/dd/yyyy)
 }
 
 Syllabus JSON:
@@ -65,7 +65,7 @@ async def recieve_syllabus(file: UploadFile):
     contents = await file.read()
     text = extract_text_from_pdf(contents)
     parsed = parse_syllabus(text)
-    return {"message": {parsed}}
+    return {"message": parsed}
 
 def extract_text_from_pdf(file):
     text = ""
