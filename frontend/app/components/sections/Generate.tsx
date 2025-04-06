@@ -154,7 +154,7 @@ export default function Generate() {
             </div>
           </div>
         </div>
-        <div className="h-screen col-span-4 px-5 py-24">
+        <div className="h-screen col-span-4 py-10">
           <Navigation/>
           <div className="flex justify-center">
             {Object.keys(syllabi).length != 0
@@ -214,7 +214,7 @@ export default function Generate() {
                         </svg>
                       </button>
                     </div>
-                    <div className="flex bg-white items-center justify-center text-center border-b-2 border-red-500">
+                    <div className="flex bg-green-500 items-center justify-center text-center border-b-2 border-red-500">
                       <p className="title w-1/3">Task</p>
                       <p className="title w-1/6">Difficulty</p>
                       <p className="title w-1/4">Due Date</p>

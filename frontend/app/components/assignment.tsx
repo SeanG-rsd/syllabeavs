@@ -15,7 +15,7 @@ const Assignment: React.FC<AssignmentProps> = ({ taskName, dueDate, difficulty, 
     }
 
     return (
-        <div className="flex bg-white items-center justify-center text-center border-b-2 border-red-500">
+        <div className="flex bg-[#1E1E1E] items-center justify-center text-center border-b-2 border-slate-300">
             <p className="info w-1/3">{taskName}</p>
             <div className="info flex w-1/6">
                 {elements}
