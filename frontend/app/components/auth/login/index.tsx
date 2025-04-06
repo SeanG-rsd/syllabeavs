@@ -12,6 +12,7 @@ const Login: React.FC = () => {
     const [email, setEmail] = useState<string>('')
     const [password, setPassword] = useState<string>('')
     const [isSigningIn, setIsSigningIn] = useState<boolean>(false)
+    const [isSignedIn, setIsSignedIn] = useState(false)
     const [errorMessage, setErrorMessage] = useState<string>('')
 
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -31,6 +32,7 @@ const Login: React.FC = () => {
         e.preventDefault()
         if (!isSigningIn) {
             setIsSigningIn(true)
+            setIsSignedIn(true)
             //
             try {
                 await doSignInWithGoogle()
@@ -43,7 +45,7 @@ const Login: React.FC = () => {
 
     return (
         <div>
-            {!user &&
+            {!isSignedIn &&
             <main className="w-full h-screen flex self-center place-content-center place-items-center">
                 <div className="w-96 text-gray-600 space-y-5 p-4 shadow-xl border rounded-xl">
                     <div className="text-center">

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { motion } from "motion/react"
 
 interface AssignmentProps {
   taskName: string;
