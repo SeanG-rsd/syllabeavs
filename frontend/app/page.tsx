@@ -16,7 +16,6 @@ export default function Home() {
         <Navigation />
       </motion.div>
       <Header />
-      <Signin />
     </section>
   );
 }
