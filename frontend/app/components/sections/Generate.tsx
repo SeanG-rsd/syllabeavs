@@ -141,7 +141,40 @@ export default function Generate() {
           <div className="flex justify-center">
           {Object.keys(syllabi).length != 0 ?
           (currentSyllabus.length === 0
-            ? <input type="file" onChange={parseSyllabus} />
+            ? (
+              <div className="h-full w-full flex items-center justify-center">
+                <input
+                  type="file"
+                  onChange={parseSyllabus}
+                  className="hidden"
+                  id="file-upload"
+                />
+                <label
+                  htmlFor="file-upload"
+                  className="h-full p-24 space-y-10 cursor-pointer border border-dashed border-slate-200 border-spacing-7 rounded-xl"
+                >
+                  <div className="flex justify-center items-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      className="size-30 text-slate-300"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m6.75 12-3-3m0 0-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+                      />
+                    </svg>
+                  </div>
+                  <p className="text-center text-slate-300 text-xl font-semibold">
+                    Select your syllabus file and watch the magic happen.
+                  </p>
+                </label>
+              </div>
+            )
             : (
               <div className="w-full">
                 <div className="flex h-20 bg-black">
@@ -155,11 +188,11 @@ export default function Generate() {
                 </div>
                 <div className="p-2 bg-gray-600 m-4"></div>
                 {currentSyllabus.map((item) => (
-                  <Assignment 
-                    taskName={item["task"]} 
-                    difficulty={item["difficulty"]} 
-                    dueDate={item["dueDate"]} 
-                    status={item["status"]} 
+                  <Assignment
+                    taskName={item["task"]}
+                    difficulty={item["difficulty"]}
+                    dueDate={item["dueDate"]}
+                    status={item["status"]}
                   />
                 ))}
               </div>
