@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Navigation() {
   return (
-    <div className="full m-auto">
+    <div className="w-[90%] m-auto">
       <div className="flex justify-between">
         <Link href="../">
           <div className="flex justify center items-center">

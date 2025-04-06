@@ -13,6 +13,7 @@ const Login: React.FC = () => {
     const [password, setPassword] = useState<string>('')
     const [isSignedIn, setIsSignedIn] = useState(false)
     const [isSigningIn, setIsSigningIn] = useState<boolean>(false)
+    const [isSignedIn, setIsSignedIn] = useState(false)
     const [errorMessage, setErrorMessage] = useState<string>('')
 
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -32,6 +33,7 @@ const Login: React.FC = () => {
         e.preventDefault()
         if (!isSigningIn) {
             setIsSigningIn(true)
+            setIsSignedIn(true)
             //
             try {
                 await doSignInWithGoogle()
