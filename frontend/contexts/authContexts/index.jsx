@@ -1,67 +1,65 @@
 "use client"
+
 import React, { useContext, useState, useEffect } from "react";
 import { auth } from "../../firebase/firebase";
+import { GoogleAuthProvider } from "firebase/auth";
 import { onAuthStateChanged } from "firebase/auth";
-import { getUserData } from '../../firebase/auth';
-//import { initializeApp } from "firebase/app";
 
 const AuthContext = React.createContext();
 
-//use auth hook, so we can use it later
-export function useAuth(){
-    return useContext(AuthContext);
+export function useAuth() {
+  return useContext(AuthContext);
 }
 
-async function initializeUser(user){
-    if(user){
-        const userData =await getUserData(user.uid);
-        setCurrentUser({
-            ...user,
-            ...userData
-        });
-        setUserLoggedIn(true);
-    }else{
-        setCurrentUser(null);
-        setUserLoggedIn(false);
+export function AuthProvider({ children }) {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [userLoggedIn, setUserLoggedIn] = useState(false);
+  const [isEmailUser, setIsEmailUser] = useState(false);
+  const [isGoogleUser, setIsGoogleUser] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, initializeUser);
+    return unsubscribe;
+  }, []);
+
+  async function initializeUser(user) {
+    if (user) {
+
+      setCurrentUser({ ...user });
+
+      // check if provider is email and password login
+      const isEmail = user.providerData.some(
+        (provider) => provider.providerId === "password"
+      );
+      setIsEmailUser(isEmail);
+
+      // check if the auth provider is google or not
+      const isGoogle = user.providerData.some(
+        (provider) => provider.providerId === GoogleAuthProvider.PROVIDER_ID
+      );
+      setIsGoogleUser(isGoogle);
+
+      setUserLoggedIn(true);
+    } else {
+      setCurrentUser(null);
+      setUserLoggedIn(false);
     }
+
     setLoading(false);
-}
+  }
 
-export function AuthProvider({ children }){
-    //when user login, current user data is set in "currentUser"
-    const [currentUser, setCurrentUser] = useState(null);
-    //if the the user logged in 'userLoggedIn' is set to true else it's defualt val -> false
-    const [userLoggedIn, setUserLoggedIn] = useState(false);
-    //'loading' is true when code is trying to load current auth state of users in progress
-    const [loading, setLoading] = useState(true);
+  const value = {
+    userLoggedIn,
+    isEmailUser,
+    isGoogleUser,
+    currentUser,
+    setCurrentUser
+  };
 
-    //when auth state is changed: user logins in or out
-
-    useEffect(()=>{
-        const unsubscribe = onAuthStateChanged(auth, initializeUser);
-        return unsubscribe;
-    },[])
-
-    async function initializeUser(user){
-        if(user){
-            setCurrentUser({  ...user });
-            setUserLoggedIn(true);
-        }else{
-            setCurrentUser(null);
-            setUserLoggedIn(false);
-        }
-        setLoading(false);
-    }
-    const value = {
-        currentUser,
-        userLoggedIn,
-        loading
-    }
-
-    return (
-        <AuthContext.Provider value={value}>
-            {!loading && children}
-        </AuthContext.Provider>
-    )
-
+  return (
+    <AuthContext.Provider value={value}>
+      {!loading && children}
+    </AuthContext.Provider>
+  );
 }

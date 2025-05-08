@@ -5,7 +5,7 @@ import { db } from './firebase';
 import { createUserWithEmailAndPassword, GoogleAuthProvider, sendPasswordResetEmail, 
     signInWithEmailAndPassword, signInWithPopup, updatePassword } from "firebase/auth";
 
-export const doCreateUserWithEmailAndPassword = async (email: string, password: string) =>{
+export const doCreateUserWithEmailAndPassword = async (email, password) =>{
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
@@ -19,7 +19,7 @@ export const doCreateUserWithEmailAndPassword = async (email: string, password: 
     await setDoc(userRef, userData);
 };
 
-export const doSignInWithEmailAndPassword = (email: string, password: string) => {
+export const doSignInWithEmailAndPassword = (email, password) => {
     return signInWithEmailAndPassword(auth, email, password);
 };
 
@@ -56,7 +56,7 @@ export const doSignOut = () => {
     return auth.signOut();
 }
 
-export const getUserData = async (userUid: string) => {
+export const getUserData = async (userUid) => {
     const userRef = doc(db, 'users', userUid);
     const userSnap = await getDoc(userRef);
 

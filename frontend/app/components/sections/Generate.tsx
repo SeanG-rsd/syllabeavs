@@ -109,7 +109,7 @@ export default function Generate() {
 
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:8001/input", {
+      const response = await fetch("http://localhost:8000/input", {
         method: "POST",
         body: formData,
       });

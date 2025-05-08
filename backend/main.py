@@ -56,7 +56,7 @@ def read_root():
     return {"message": "Hello World"}
 
 @app.post("/generate")
-async def receive_string(request: str):
+async def receive_string(request: Request):
     logging.debug(f"Received file:")
     body = await request.body()
     text = body.decode()
@@ -83,7 +83,7 @@ def parse_syllabus(text):
         model="gpt-4o-mini",
         messages=[
             {
-                "role":"developer",
+                "role":"system",
                 "content": syllabusQuery
             },
             {

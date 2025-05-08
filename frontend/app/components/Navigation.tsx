@@ -3,12 +3,28 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { IoClose } from "react-icons/io5";
 import Signin from "../components/auth/login/index";
+import Register from "./auth/register";
 
 export default function Navigation() {
   const [showSignIn, setShowSignIn] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
 
-  const close = () => {
+  const closeSignIn = () => {
     setShowSignIn(false);
+  }
+
+  const openSignIn = () => {
+    setShowSignIn(true);
+    setShowRegister(false);
+  }
+
+  const openRegister = () => {
+    setShowRegister(true);
+    setShowSignIn(false);
+  }
+
+  const closeRegister = () => {
+    setShowRegister(false);
   }
 
   return (
@@ -44,6 +60,18 @@ export default function Navigation() {
             />
           </svg>
         </button>
+        {showRegister && (
+          <div className="fixed bg-black/50 min-h-screen w-screen z-10 flex justify-center items-center top-0 left-0 text-white">
+          <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ scale: 0 }}
+                key="box"
+              >
+                <Register close={closeRegister} signIn={openSignIn}/>
+              </motion.div>
+        </div>
+        )}
         {showSignIn && (
           <div className="fixed bg-black/50 min-h-screen w-screen z-10 flex justify-center items-center top-0 left-0 text-white">
             <motion.div
@@ -52,14 +80,14 @@ export default function Navigation() {
                   exit={{ scale: 0 }}
                   key="box"
                 >
-                  <Signin close={close}/>
-                  <div className="absolute top-2 right-2 hover:scale-105 hover:cursor-pointer transition duration-200">
+                  <Signin close={closeSignIn} register={openRegister}/>
+                  {/* <div className="absolute top-2 right-2 hover:scale-105 hover:cursor-pointer transition duration-200">
                     <IoClose
                       onClick={() => setShowSignIn(false)}
                       size={30}
                       className="mt-1 mr-1 text-white"
                     />
-                  </div>
+                  </div> */}
                 </motion.div>
           </div>
         )}

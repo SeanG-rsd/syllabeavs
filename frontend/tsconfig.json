@@ -33,7 +33,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "firebase/firebase.js", "firebase/auth.js", "app/components/auth/login/index.tsx"  ],
   "exclude": [
     "node_modules"
   ]
