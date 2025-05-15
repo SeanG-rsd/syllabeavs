@@ -1,216 +1,127 @@
 "use client";
 
-import { IoClose } from "react-icons/io5";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
-import Assignment from "../components/assignments/assignment";
+import AssignmentUI from "../components/assignments/assignment";
+import { Assignment } from "../types/assignment";
 import Navigation from "../components/Navigation";
-import { auth } from "@/app/api/firebase/firebase";
-import { collection, getDocs } from "firebase/firestore";
+import {
+  getDate,
+  getDifficulty,
+  getProgress,
+} from "@/app/util/syllabusSorting";
+import { getSyllabiData, parseSyllabusData, updateAssignmentData } from "../api/syllabus/syllabi";
 
 export default function Generate() {
   const [showModal, setShowModal] = useState(false);
-  
-    const [currentSyllabus, setCurrentSyllabus] = useState<Assignment[]>([]);
-    const [currentClass, setCurrentClass] = useState("");
-  
-    const [shake, setShake] = useState(false);
-  
-    const [currentInput, setInput] = useState("");
-  
-    const [syllabi, setSyllabi] = useState<{ [key: string]: Assignment[] }>({});
-  
-    const [isLoading, setLoading] = useState(false);
-    const [loadingInfo, setLoadingInfo] = useState("Loading Assignments...");
-  
-    useEffect(() => {
-      getSyllabi();
-    }, []);
-  
-    useEffect(() => {
-      if (isLoading) {
-        console.log("test");
-        setTimeout(() => {
-          if (isLoading) {
-            setLoadingInfo("Almost There...");
-          }
-        }, 5000);
-      } else {
-        setLoadingInfo("Loading Assignments...");
-      }
-    }, [isLoading]);
-  
-    useEffect(() => {
-      if (currentInput != "") {
-        updateCurrentClass(currentInput);
-  
-        setInput("");
-      }
-    }, [syllabi]);
-  
-    const addClass = () => {
-      if (currentInput != "") {
-        setSyllabi((prev) => ({
-          ...prev,
-          [currentInput]: [],
-        }));
-  
-        setShowModal(false);
-        setShake(false);
-      } else {
-        setShake(true);
-  
-        setTimeout(() => {
-          setShake(false);
-        }, 500);
-      }
-    };
-  
-    const updateCurrentSyllabus = (assignment: []) => {
-      syllabi[currentClass] = assignment;
-      setSyllabi(syllabi);
-      setCurrentClass(currentClass);
-      setCurrentSyllabus(assignment);
-      console.log("update syllabi");
-      console.log(assignment.length);
-    };
-  
-    const updateCurrentClass = (className: string) => {
-      setCurrentClass(className);
-      setCurrentSyllabus(syllabi[className]);
-    };
-  
-    const sortCurrentSyllabus = (
-      first: Function,
-      second: Function,
-      third: Function,
-    ) => {
-      setCurrentSyllabus([...currentSyllabus].sort((a, b) => {
-        if (first(a, b) != 0) {
-          return first(a, b);
-        } else if (second(a, b) != 0) {
-          return second(a, b);
+
+  const [currentSyllabus, setCurrentSyllabus] = useState<Assignment[]>([]);
+  const [currentClass, setCurrentClass] = useState("");
+
+  const [shake, setShake] = useState(false);
+
+  const [currentInput, setInput] = useState("");
+
+  const [syllabi, setSyllabi] = useState<{ [key: string]: Assignment[] }>({});
+
+  const [isLoading, setLoading] = useState(false);
+  const [loadingInfo, setLoadingInfo] = useState("Loading Assignments...");
+
+  useEffect(() => {
+    getSyllabi();
+  }, []);
+
+  useEffect(() => {
+    if (isLoading) {
+      console.log("test");
+      setTimeout(() => {
+        if (isLoading) {
+          setLoadingInfo("Almost There...");
         }
-        return third(a, b);
+      }, 5000);
+    } else {
+      setLoadingInfo("Loading Assignments...");
+    }
+  }, [isLoading]);
+
+  useEffect(() => {
+    if (currentInput != "") {
+      updateCurrentClass(currentInput);
+
+      setInput("");
+    }
+  }, [syllabi]);
+
+  const addClass = () => {
+    if (currentInput != "") {
+      setSyllabi((prev) => ({
+        ...prev,
+        [currentInput]: [],
       }));
-    };
-  
-    const getDifficulty = (a: never, b: never) => {
-      return a["difficulty"] - b["difficulty"];
-    };
-  
-    const getDate = (a: never, b: never) => {
-      return new Date(a["dueDate"]).getTime() - new Date(b["dueDate"]).getTime();
-    };
-  
-    const getProgress = (a: never, b: never) => {
-      if (a["status"] == b["status"]) return 0;
-      if (a["status"] == "In Progress") return -1;
-      if (a["status"] == "Not Started" && b["status"] == "Complete") return -1;
-      return 1;
-    };
-  
-    const updateCurrentStatus = async (status: string, index: number) => {
-      console.log(`${status} for assignment ${index}`);
-  
-      currentSyllabus[index]["status"] = status;
-  
-      const user = auth.currentUser;
-      if (!user) {
-        console.error("Not signed in");
-        return;
+
+      setShowModal(false);
+      setShake(false);
+    } else {
+      setShake(true);
+
+      setTimeout(() => {
+        setShake(false);
+      }, 500);
+    }
+  };
+
+  const updateCurrentSyllabus = (assignment: []) => {
+    syllabi[currentClass] = assignment;
+    setSyllabi(syllabi);
+    setCurrentClass(currentClass);
+    setCurrentSyllabus(assignment);
+    console.log("update syllabi");
+    console.log(assignment.length);
+  };
+
+  const updateCurrentClass = (className: string) => {
+    setCurrentClass(className);
+    setCurrentSyllabus(syllabi[className]);
+  };
+
+  const sortCurrentSyllabus = (
+    first: Function,
+    second: Function,
+    third: Function,
+  ) => {
+    setCurrentSyllabus([...currentSyllabus].sort((a, b) => {
+      if (first(a, b) != 0) {
+        return first(a, b);
+      } else if (second(a, b) != 0) {
+        return second(a, b);
       }
-  
-      const token = await user.getIdToken();
-  
-      try {
-        const response = await fetch("https://localhost:8000/update", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            currentClass: currentClass,
-            assignments: currentSyllabus,
-          }),
-        });
-  
-        console.log(response);
-        console.log("updated status");
-      } catch (e) {
-        console.log(e);
-      }
-    };
-  
-    const getSyllabi = async () => {
-      const user = auth.currentUser;
-      if (!user) {
-        console.error("Not signed in");
-        return;
-      }
-  
-      const token = await user.getIdToken();
-  
-      try {
-        const response = await fetch("http://localhost:8000/syllabi", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-  
-        const data = await response.json();
-        console.log(data.syllabi);
-        for (const syllabus of data.syllabi) {
-          const assignments = syllabus["assignments"];
-          const className = syllabus["className"];
-  
-          setSyllabi((prev) => ({
-            [className]: assignments,
-            ...prev,
-          }));
-        }
-      } catch (error) {
-        console.error("Error getting syllabi:", error);
-      }
-    };
-  
-    const parseSyllabus = async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      const formData = new FormData();
-      if (file != null) {
-        formData.append("file", file);
-      } else {
-        return;
-      }
-  
-      const user = auth.currentUser;
-      if (!user) {
-        console.error("Not signed in");
-        return;
-      }
-  
-      const token = await user.getIdToken();
-  
-      try {
-        setLoading(true);
-        const response = await fetch("http://localhost:8000/input", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            ClassName: currentClass,
-          },
-          body: formData,
-        });
-  
-        setLoading(false);
-        const data = await response.json();
-        console.log(data.message);
-        updateCurrentSyllabus(JSON.parse(data.message));
-      } catch (error) {
-        console.error("Error uploading file:", error);
-      }
-    };
+      return third(a, b);
+    }));
+  };
+
+  const updateCurrentStatus = async (status: string, index: number) => {
+    const response = updateAssignmentData(status, index, currentClass, currentSyllabus);
+  };
+
+  const getSyllabi = async () => {
+    const output = await getSyllabiData();
+
+    if (output != null) {
+      setSyllabi((prev) => ({
+        ...output,
+        ...prev,
+      }));
+    }
+  };
+
+  const parseSyllabus = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLoading(true);
+
+    const parsed = await parseSyllabusData(e, currentClass);
+
+    setLoading(false);
+    updateCurrentSyllabus(parsed);
+  };
 
   return (
     <section className="flex min-w-screen min-h-screen bg-[#292929]">
@@ -470,7 +381,7 @@ export default function Generate() {
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.5, delay: index * 0.05 }}
                         >
-                          <Assignment
+                          <AssignmentUI
                             taskName={item.task}
                             difficulty={item.difficulty}
                             dueDate={item.dueDate}
