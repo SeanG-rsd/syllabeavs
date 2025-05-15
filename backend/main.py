@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, File, UploadFile
+from fastapi import FastAPI, Request, File, UploadFile, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from openai import OpenAI
 import PyPDF2
@@ -6,10 +6,18 @@ import os
 from dotenv import load_dotenv
 import io
 import logging
+from firebase_admin import firestore, db as realtimedb
+from firebase_admin import credentials, initialize_app, auth
+import json
 
 load_dotenv()
 api_key = os.getenv("API_KEY")
 
+cred_path = os.getenv("FIREBASE_CREDENTIAL_PATH")
+cred = credentials.Certificate(cred_path)
+initialize_app(cred)
+
+db = firestore.client()
 app = FastAPI()
 
 client = OpenAI(api_key=api_key)
@@ -34,11 +42,14 @@ Assignment JSON:
 
 
 Syllabus JSON:
-[
-    Assignment JSON,
-    Assignment JSON,
-    ...
-]
+{
+"class" : string
+"assignments" : [
+        Assignment JSON,
+        Assignment JSON,
+        ...
+    ]
+}
 
 NO QUOTATION MARKS
 """
@@ -62,12 +73,58 @@ async def receive_string(request: Request):
     text = body.decode()
     return {"message": f"Test: {text}"}
 
+async def verify_token(request: Request):
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+       # raise HTTP(status_code=401, detail="Missing auth token")
+       print("Missing auth token")
+    try:
+        id_token = auth_header.split("Bearer ")[1]
+        decoded_token = auth.verify_id_token(id_token)
+        return decoded_token
+    except Exception:
+        return None
+
+@app.get("/syllabi")
+async def get_syllabi(request: Request, user_data: dict = Depends(verify_token)):
+    if (user_data != None):
+        user_id = user_data["uid"]
+        syllabi = db.collection("users").document(user_id).collection("syllabi").stream()
+
+        data = []
+        for document_snapshot in syllabi:
+            doc_data = document_snapshot.to_dict()
+            doc_data["className"] = document_snapshot.id
+            data.append(doc_data)
+
+
+        print("barrier")
+        print(json.dumps(data, indent=4))
+        return {"syllabi": data}
+
+    return {}
+
+@app.post("/update")
+async def update_syllabi(request: Request, user_data: dict = Depends(verify_token)):
+    if (user_data != None):
+        user_id = user_data["uid"]
+        data = await request.json()
+        current_class = data["currentClass"]
+        assignments = data["assignments"]
+        db.collection("users").document(user_id).collection("syllabi").document(current_class).set({"assignments": assignments})
+
 @app.post("/input")
-async def recieve_syllabus(file: UploadFile):
+async def recieve_syllabus(request: Request, file: UploadFile, user_data: dict = Depends(verify_token)):
+    name = request.headers.get("ClassName")
     contents = await file.read()
     text = extract_text_from_pdf(contents)
-    parsed = parse_syllabus(text)
-    return {"message": parsed}
+    parsed = json.loads(parse_syllabus(text))
+   
+    if (user_data != None):
+        user_id = user_data["uid"]
+        db.collection("users").document(user_id).collection("syllabi").document(name).set({"assignments": parsed["assignments"]})
+
+    return {"message": json.dumps(parsed["assignments"])}
 
 def extract_text_from_pdf(file):
     text = ""

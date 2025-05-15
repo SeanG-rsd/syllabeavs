@@ -3,17 +3,35 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import Assignment from "../assignment";
 import Navigation from "../Navigation";
+import { auth, db } from "../../../firebase/firebase.js";
+import { collection, getDocs } from "firebase/firestore";
+
+type Assignment = {
+  task: string;
+  dueDate: string;
+  status: string;
+  class: string;
+  difficulty: number;
+};
 
 export default function Generate() {
   const [showModal, setShowModal] = useState(false);
-  const [currentSyllabus, setCurrentSyllabus] = useState([]);
+
+  const [currentSyllabus, setCurrentSyllabus] = useState<Assignment[]>([]);
   const [currentClass, setCurrentClass] = useState("");
+
   const [shake, setShake] = useState(false);
+
   const [currentInput, setInput] = useState("");
-  const [syllabi, setSyllabi] = useState<{ [key: string]: [] }>({});
+
+  const [syllabi, setSyllabi] = useState<{ [key: string]: Assignment[] }>({});
 
   const [isLoading, setLoading] = useState(false);
   const [loadingInfo, setLoadingInfo] = useState("Loading Assignments...");
+
+  useEffect(() => {
+    getSyllabi();
+  }, []);
 
   useEffect(() => {
     if (isLoading) {
@@ -98,6 +116,71 @@ export default function Generate() {
     return 1;
   };
 
+  const updateCurrentStatus = async (status: string, index: number) => {
+    console.log(`${status} for assignment ${index}`);
+
+    currentSyllabus[index]["status"] = status;
+
+    const user = auth.currentUser;
+    if (!user) {
+      console.error("Not signed in");
+      return;
+    }
+
+    const token = await user.getIdToken();
+
+    try {
+      const response = await fetch("https://localhost:8000/update", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          currentClass: currentClass,
+          assignments: currentSyllabus,
+        }),
+      });
+
+      console.log(response);
+      console.log("updated status");
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const getSyllabi = async () => {
+    const user = auth.currentUser;
+    if (!user) {
+      console.error("Not signed in");
+      return;
+    }
+
+    const token = await user.getIdToken();
+
+    try {
+      const response = await fetch("http://localhost:8000/syllabi", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+      console.log(data.syllabi);
+      for (const syllabus of data.syllabi) {
+        const assignments = syllabus["assignments"];
+        const className = syllabus["className"];
+
+        setSyllabi((prev) => ({
+          [className]: assignments,
+          ...prev,
+        }));
+      }
+    } catch (error) {
+      console.error("Error getting syllabi:", error);
+    }
+  };
+
   const parseSyllabus = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     const formData = new FormData();
@@ -107,10 +190,22 @@ export default function Generate() {
       return;
     }
 
+    const user = auth.currentUser;
+    if (!user) {
+      console.error("Not signed in");
+      return;
+    }
+
+    const token = await user.getIdToken();
+
     try {
       setLoading(true);
       const response = await fetch("http://localhost:8000/input", {
         method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          ClassName: currentClass,
+        },
         body: formData,
       });
 
@@ -128,7 +223,9 @@ export default function Generate() {
       <div className="w-72 h-screen bg-[#1E1E1E] col-span-1 p-10 flex-shrink-0 fixed">
         <div className="flex justify-center">
           <div className="w-[90%] space-y-5 flex flex-col">
-            <h1 className="text-start text-white">Your classes</h1>
+            <h1 className="text-start text-white">
+              Your classes
+            </h1>
             {Object.keys(syllabi).map((name) =>
               name == currentClass
                 ? (
@@ -160,13 +257,13 @@ export default function Generate() {
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                stroke-width="1.5"
+                strokeWidth="1.5"
                 stroke="currentColor"
                 className="group-hover:rotate-180 transition duration-200 ml-2 text-white size-4"
               >
                 <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   d="M12 4.5v15m7.5-7.5h-15"
                 />
               </svg>
@@ -294,13 +391,13 @@ export default function Generate() {
                               xmlns="http://www.w3.org/2000/svg"
                               fill="none"
                               viewBox="0 0 24 24"
-                              stroke-width="1.5"
+                              strokeWidth="1.5"
                               stroke="currentColor"
                               className="size-30 text-slate-300"
                             >
                               <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
                                 d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m6.75 12-3-3m0 0-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
                               />
                             </svg>
@@ -374,16 +471,18 @@ export default function Generate() {
                     </div>
                     {currentSyllabus.map((item, index) => (
                       <motion.div
-                      initial={{ opacity: 0, y: 40 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: index * 0.05 }}
-                    >
-                      <Assignment
-                        taskName={item["task"]}
-                        difficulty={item["difficulty"]}
-                        dueDate={item["dueDate"]}
-                        status={item["status"]}
-                      />
+                        initial={{ opacity: 0, y: 40 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: index * 0.05 }}
+                      >
+                        <Assignment
+                          taskName={item.task}
+                          difficulty={item.difficulty}
+                          dueDate={item.dueDate}
+                          status={item.status}
+                          index={index}
+                          updateStatus={updateCurrentStatus}
+                        />
                       </motion.div>
                     ))}
                   </div>
@@ -406,12 +505,12 @@ export default function Generate() {
                         fill="none"
                         viewBox="0 0 24 24"
                       >
-                        <g clip-path="url(#a)">
+                        <g clipPath="url(#a)">
                           <path
                             stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
                             d="m10.4149 10.7623.0005.0109m3.0868 3.0764.0005.0108M8.91554 15.349l.00046.0108m-.8276-8.44549L4.39857 19.9133l12.95163-3.7371m-.8271-8.43475c2.0971 2.09707 3.269 4.77055 3.5172 7.51635.067.7413-.4619 1.3752-1.1869 1.5293-1.0146.2158-1.9613-.5811-2.0926-1.615-.2412-1.9-.9437-3.5721-2.52-5.1484-1.5779-1.57793-3.3173-2.3457-5.25302-2.61955-1.02139-.1445-1.79555-1.1099-1.5387-2.10314.17236-.66653.76818-1.14208 1.45754-1.08543 2.78088.22851 5.49388 1.40332 7.61648 3.52587Z"
                           />
                         </g>
