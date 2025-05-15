@@ -2,7 +2,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { IoClose } from "react-icons/io5";
-import Signin from "../components/auth/login/index";
+import Signin from "./auth/login";
 import Register from "./auth/register";
 
 export default function Navigation() {

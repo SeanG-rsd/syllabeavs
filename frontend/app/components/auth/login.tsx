@@ -5,10 +5,10 @@ import Link from "next/link";
 import {
     doSignInWithEmailAndPassword,
     doSignInWithGoogle,
-} from "../../../../firebase/auth";
+} from "../../api/firebase/auth";
 import { getAuth } from "firebase/auth";
 import { IoClose } from "react-icons/io5";
-import { useAuth } from "@/contexts/authContexts";
+import { useAuth } from "../../contexts/authContext";
 import { useRouter } from "next/navigation";
 
 interface LoginProps {

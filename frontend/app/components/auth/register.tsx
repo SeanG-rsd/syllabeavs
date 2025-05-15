@@ -1,8 +1,8 @@
 "use client";
 import React, { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../../../../contexts/authContexts";
-import { doCreateUserWithEmailAndPassword } from "../../../../firebase/auth";
+import { useAuth } from "../../contexts/authContext";
+import { doCreateUserWithEmailAndPassword } from "../../api/firebase/auth";
 import Link from "next/link";
 import { IoClose } from "react-icons/io5";
 

@@ -1,8 +1,8 @@
 "use client"
 
 import Navigation from "./components/Navigation";
-import Header from "./components/sections/Header";
-import Signin from "./components/auth/login/index";
+import Header from "./components/Header";
+import Signin from "./components/auth/login";
 import { motion } from "motion/react";
 
 export default function Home() {

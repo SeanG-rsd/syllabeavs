@@ -1,6 +1,6 @@
 import './globals.css';
 import { ReactNode } from 'react';
-import { AuthProvider } from '../contexts/authContexts/index'; // update path if needed
+import { AuthProvider } from './contexts/authContext';
 
 export const metadata = {
   title: 'Your App',
