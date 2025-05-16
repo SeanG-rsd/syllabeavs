@@ -76,7 +76,7 @@ export const getSyllabiData = async () => {
 export const updateAssignmentData = async (status: string, index: number, currentClass: string, currentSyllabus: Assignment[]) => {
     console.log(`${status} for assignment ${index}`);
 
-    //currentSyllabus[index]["status"] = status;
+    currentSyllabus[index].status = status;
 
     const user = auth.currentUser;
     if (!user) {
@@ -91,6 +91,7 @@ export const updateAssignmentData = async (status: string, index: number, curren
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           currentClass: currentClass,

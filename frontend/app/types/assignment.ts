@@ -1,7 +1,7 @@
 export type Assignment = {
   task: string;
   dueDate: string;
-  status: "Not Started" | "In Progress" | "Completed";
+  status: string;
   class: string;
   difficulty: number;
 };

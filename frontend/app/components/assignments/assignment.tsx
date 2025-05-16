@@ -1,21 +1,14 @@
 import { useState, useEffect } from "react";
 import { motion } from "motion/react"
+import { Assignment } from "@/app/types/assignment";
 
 interface AssignmentProps {
-  taskName: string;
-  dueDate: string;
-  difficulty: number;
-  status: string;
-  index: number;
-  updateStatus: (status: string, index: number) => void;
+  assignment: Assignment;
+  updateStatus: (status: string) => void;
 }
 
-const Assignment: React.FC<AssignmentProps> = ({
-  taskName,
-  dueDate,
-  difficulty,
-  status,
-  index,
+const AssignmentUI: React.FC<AssignmentProps> = ({
+  assignment,
   updateStatus
 }) => {
     const [assignmentState, setAssignmentState] = useState(status);
@@ -29,11 +22,11 @@ const Assignment: React.FC<AssignmentProps> = ({
         if (assignmentState == "Not Started") setStateColor("text-red-600");
         else if (assignmentState == "In Progress") setStateColor("text-yellow-600");
         else if (assignmentState == "Complete") setStateColor("text-green-600"); 
-        updateStatus(assignmentState, index)
+        updateStatus(assignmentState)
     }, [assignmentState]);
 
   const elements = [];
-  for (let i = 0; i < difficulty; i++) {
+  for (let i = 0; i < assignment.difficulty; i++) {
     elements.push(
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -54,9 +47,9 @@ const Assignment: React.FC<AssignmentProps> = ({
 
   return (
     <div className="m-4 rounded-lg flex items-center justify-center text-center">
-      <p className="info w-1/3 text-white">{taskName}</p>
+      <p className="info w-1/3 text-white">{assignment.task}</p>
       <div className="info flex w-1/6 text-slate-400">{elements}</div>
-      <p className="info w-1/4 text-slate-400">{dueDate}</p>
+      <p className="info w-1/4 text-slate-400">{assignment.dueDate}</p>
       <div className={`info w-1/4 flex items-center group relative ${stateColor} hover:cursor-pointer`}>
         {assignmentState}
         <svg
@@ -92,4 +85,4 @@ const Assignment: React.FC<AssignmentProps> = ({
   );
 };
 
-export default Assignment;
+export default AssignmentUI;
