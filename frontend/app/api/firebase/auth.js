@@ -1,11 +1,13 @@
 import { auth } from "./firebase";
-import { collection, getFirestore, doc, setDoc, getDoc} from "firebase/firestore";
+import { collection, getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 import { db } from './firebase';
 
-import { createUserWithEmailAndPassword, GoogleAuthProvider, sendPasswordResetEmail, 
-    signInWithEmailAndPassword, signInWithPopup, updatePassword } from "firebase/auth";
+import {
+    createUserWithEmailAndPassword, GoogleAuthProvider, sendPasswordResetEmail, reauthenticateWithCredential,
+    signInWithEmailAndPassword, signInWithPopup, updatePassword, reauthenticateWithPopup, EmailAuthProvider
+} from "firebase/auth";
 
-export const doCreateUserWithEmailAndPassword = async (email, password) =>{
+export const doCreateUserWithEmailAndPassword = async (email, password) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
@@ -25,25 +27,25 @@ export const doSignInWithEmailAndPassword = (email, password) => {
 
 export const doSignInWithGoogle = async () => {
     try {
-    const provider = new GoogleAuthProvider();
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
+        const provider = new GoogleAuthProvider();
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
 
-    //store user data
-    const userRef = doc(collection(db, 'users'), user.uid);
-    const userData = {
-        email: user.email,
-        displayName: user.displayName || 'Mysterious',
-        photoURL: user.photoURL || 'https://example.com/default-photo.jpg',
-    };
+        //store user data
+        const userRef = doc(collection(db, 'users'), user.uid);
+        const userData = {
+            email: user.email,
+            displayName: user.displayName || 'Mysterious',
+            photoURL: user.photoURL || 'https://example.com/default-photo.jpg',
+        };
 
-    //checks if user alr exists in firestore
-    const docSnapshot = await getDoc(userRef);
-    if(!docSnapshot.exists()){
-        //user data DNE, store it
-        await setDoc(userRef, userData);
-    }
-    }catch(error){
+        //checks if user alr exists in firestore
+        const docSnapshot = await getDoc(userRef);
+        if (!docSnapshot.exists()) {
+            //user data DNE, store it
+            await setDoc(userRef, userData);
+        }
+    } catch (error) {
         console.error("Error during Google sign in: ", error);
         throw error;
     }
@@ -54,15 +56,55 @@ export const doSignInWithGoogle = async () => {
 
 export const doSignOut = () => {
     return auth.signOut();
+
 }
+
+export const reauthenticateGoogleAndDelete = async () => {
+  const user = auth.currentUser;
+  if (!user) throw new Error("No authenticated user.");
+
+  const provider = new GoogleAuthProvider();
+
+  try {
+    await reauthenticateWithPopup(user, provider);
+    await user.delete();
+    console.log("User account deleted.");
+  } catch (error) {
+    console.error("Error during Google re-authentication:", error);
+    throw error;
+  }
+};
+
+export const reauthenticateAndDeleteAccount = async (email, password) => {
+  const user = auth.currentUser;
+
+  if (!user) throw new Error("No authenticated user.");
+
+  try {
+    const credential = EmailAuthProvider.credential(email, password);
+    await reauthenticateWithCredential(user, credential);
+    await user.delete();
+    console.log("User account deleted.");
+  } catch (error) {
+    console.error("Error during account deletion:", error);
+    if (error.code === "auth/wrong-password") {
+      throw new Error("Incorrect password.");
+    } else if (error.code === "auth/user-mismatch") {
+      throw new Error("Re-authentication mismatch.");
+    } else if (error.code === "auth/invalid-credential") {
+      throw new Error("Invalid credentials.");
+    }
+    throw error;
+  }
+};
 
 export const getUserData = async (userUid) => {
     const userRef = doc(db, 'users', userUid);
     const userSnap = await getDoc(userRef);
 
-    if(userSnap.exists()){
+    if (userSnap.exists()) {
         return userSnap.data();
-    }else{
+    } else {
         console.log("No Data found for user");
         return null;
     }

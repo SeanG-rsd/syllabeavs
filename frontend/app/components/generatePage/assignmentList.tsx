@@ -44,7 +44,7 @@ const AssignmentList: React.FC<AssignmentListProps> = (
                             newAscend,
                         );
                     }}
-                    className="w-1/6 flex items-center"
+                    className="w-1/6 flex items-center cursor-pointer"
                 >
                     <div className="title">
                         Difficulty
@@ -70,7 +70,7 @@ const AssignmentList: React.FC<AssignmentListProps> = (
                     </motion.div>
                 </button>
                 <button
-                    className="w-1/4 flex items-center"
+                    className="w-1/4 flex items-center cursor-pointer"
                     onClick={() => {
                         const newAscend = !dateAscend;
                         setDate(newAscend);
@@ -106,7 +106,7 @@ const AssignmentList: React.FC<AssignmentListProps> = (
                     </motion.div>
                 </button>
                 <button
-                    className="w-1/4 flex items-center"
+                    className="w-1/4 flex items-center cursor-pointer"
                     onClick={() => {
                         const newAscend = !progressAscend;
                         setProgress(newAscend);

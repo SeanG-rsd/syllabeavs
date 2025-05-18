@@ -104,6 +104,15 @@ async def get_syllabi(request: Request, user_data: dict = Depends(verify_token))
 
     return {}
 
+@app.post("/delete")
+async def delete_syllabus(request: Request, user_data: dict = Depends(verify_token)):
+    if (user_data != None):
+        user_id = user_data["uid"]
+        data = await request.json()
+        className = data["class"]
+        db.collection("users").document(user_id).collection("syllabi").document(className).delete()
+        print('deleted: ', className)
+
 @app.post("/update")
 async def update_syllabi(request: Request, user_data: dict = Depends(verify_token)):
     if (user_data != None):

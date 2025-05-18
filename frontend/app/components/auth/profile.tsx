@@ -2,10 +2,16 @@
 import React, { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../contexts/authContext";
-import { doCreateUserWithEmailAndPassword, doSignOut } from "../../api/firebase/auth";
+import {
+    reauthenticateAndDeleteAccount,
+    reauthenticateGoogleAndDelete,
+    doCreateUserWithEmailAndPassword,
+    doSignOut,
+} from "../../api/firebase/auth";
 import Link from "next/link";
 import { IoClose } from "react-icons/io5";
 import { auth } from "@/app/api/firebase/firebase";
+import DeleteAccountModal from "./confirmDeleteAccountModal";
 
 interface ProfileProps {
     close: () => void;
@@ -18,24 +24,61 @@ const Profile: React.FC<ProfileProps> = ({ close, signIn }) => {
     const [isSigningOut, setIsSigningOut] = useState(false);
     const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
-    const { userLoggedIn } = useAuth();
+    const [deleteProfileModal, setDeleteProfileModal] = useState(false);
+
+    const { currentUser, userLoggedIn, isEmailUser, isGoogleUser } = useAuth();
 
     useEffect(() => {
         if (userLoggedIn) {
-            router.replace("generate");
+            // router.replace("generate");
         }
     }, [userLoggedIn]);
 
     const onSignOut = () => {
-        doSignOut();
-        router.replace("/");
+        if (!isDeletingAccount) {
+            setIsSigningOut(true);
+
+            setTimeout(() => {
+                router.replace("/");
+                doSignOut();
+                setIsSigningOut(false);
+            }, 1000);
+        }
     };
 
-    const onDeleteAccount = async () => {
+    const onConfirmDeleteAccount = (email: string, password: string) => {
+        setIsDeletingAccount(true);
+        setDeleteProfileModal(false);
+
+        setTimeout(() => {
+            if (isGoogleUser) {
+                reauthenticateGoogleAndDelete();
+            }
+            else if (isEmailUser) {
+                reauthenticateAndDeleteAccount(email, password);
+            }
+            router.replace("/");
+            setIsDeletingAccount(false);
+        }, 1000);
+    };
+
+    const onDeleteAccount = () => {
+        if (!isSigningOut) {
+            setDeleteProfileModal(true);
+        }
     };
 
     return (
         <>
+            {deleteProfileModal
+                ? (
+                    <DeleteAccountModal
+                        close={() => setDeleteProfileModal(false)}
+                        confirmDeleteAccount={onConfirmDeleteAccount}
+                        isGoogle={isGoogleUser}
+                    />
+                )
+                : <div />}
             <main className="w-full h-screen flex self-center place-content-center place-items-center">
                 <div className="w-96 bg-white text-gray-600 space-y-5 p-4 shadow-xl border rounded-xl">
                     <div className="flex items-center justify-between mt-2">
@@ -70,7 +113,7 @@ const Profile: React.FC<ProfileProps> = ({ close, signIn }) => {
                         {isSigningOut ? "Signing Out..." : "Sign Out"}
                     </button>
                     <button
-                        type="submit"
+                        onClick={onDeleteAccount}
                         disabled={isDeletingAccount}
                         className={`w-full px-4 py-2 text-white font-medium rounded-lg ${
                             isDeletingAccount

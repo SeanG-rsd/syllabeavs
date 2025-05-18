@@ -103,3 +103,28 @@ export const updateAssignmentData = async (status: string, index: number, curren
     }
   };
 
+  export const deleteSyllabus = async (className: string) => {
+    const user = auth.currentUser;
+    if (!user) {
+      console.error("Not signed in");
+      return;
+    }
+
+    const token = await user.getIdToken();
+
+    try {
+      await fetch("http://localhost:8000/delete", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          class: className
+        }),
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
