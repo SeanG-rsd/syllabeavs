@@ -19,8 +19,6 @@ const SideBar: React.FC<SideBarProps> = (
         setShowModal(false);
     };
 
-    console.log("rebuild: ", isInOverview);
-
     return (
         <div className="w-72 h-screen bg-[#1E1E1E] col-span-1 p-10 flex-shrink-0 fixed">
             <div className="flex justify-center">

@@ -4,10 +4,13 @@ import { AnimatePresence, motion } from "motion/react";
 import { IoClose } from "react-icons/io5";
 import Signin from "./auth/login";
 import Register from "./auth/register";
+import Profile from "./auth/profile";
+import { auth } from "../api/firebase/firebase";
 
 export default function Navigation() {
   const [showSignIn, setShowSignIn] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
 
   const closeSignIn = () => {
     setShowSignIn(false);
@@ -16,6 +19,7 @@ export default function Navigation() {
   const openSignIn = () => {
     setShowSignIn(true);
     setShowRegister(false);
+    setShowProfile(false);
   }
 
   const openRegister = () => {
@@ -25,6 +29,25 @@ export default function Navigation() {
 
   const closeRegister = () => {
     setShowRegister(false);
+  }
+
+  const openProfile = () => {
+    setShowProfile(true);
+  }
+
+  const closeProfile = () => {
+    setShowProfile(false);
+  }
+
+  const open = () => {
+    const user = auth.currentUser;
+
+    if (user) {
+      openProfile();
+      return;
+    }
+
+    openSignIn();
   }
 
   return (
@@ -43,7 +66,7 @@ export default function Navigation() {
         </Link>
         <button
           className="hover:cursor-pointer"
-          onClick={() => setShowSignIn(true)}
+          onClick={open}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -90,6 +113,18 @@ export default function Navigation() {
                   </div> */}
                 </motion.div>
           </div>
+        )}
+        {showProfile && (
+          <div className="fixed bg-black/50 min-h-screen w-screen z-10 flex justify-center items-center top-0 left-0 text-white">
+          <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ scale: 0 }}
+                key="box"
+              >
+                <Profile close={closeProfile} signIn={openSignIn}/>
+              </motion.div>
+        </div>
         )}
       </div>
     </div>

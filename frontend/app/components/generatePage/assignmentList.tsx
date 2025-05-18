@@ -13,6 +13,7 @@ interface AssignmentListProps {
         first: Function,
         second: Function,
         third: Function,
+        ascending: boolean,
     ) => void;
     updateStatus: (
         status: string,
@@ -24,42 +25,121 @@ interface AssignmentListProps {
 const AssignmentList: React.FC<AssignmentListProps> = (
     { updateSyllabus, updateStatus, syllabus },
 ) => {
+    const [dateAscend, setDate] = useState(false);
+    const [diffAscend, setDiff] = useState(false);
+    const [progressAscend, setProgress] = useState(false);
+
     return (
         <div className="w-full h-full items-center">
             <div className="m-4 rounded-lg flex items-center justify-center text-center bg-[#1E1E1E] text-white border-slate-300">
                 <p className="title w-1/3">Task</p>
                 <button
-                    onClick={() =>
+                    onClick={() => {
+                        const newAscend = !diffAscend;
+                        setDiff(newAscend);
                         updateSyllabus(
                             getDifficulty,
                             getDate,
                             getProgress,
-                        )}
-                    className="title w-1/6"
+                            newAscend,
+                        );
+                    }}
+                    className="w-1/6 flex items-center"
                 >
-                    Difficulty
+                    <div className="title">
+                        Difficulty
+                    </div>
+                    <motion.div
+                        animate={{ rotateZ: diffAscend ? 0 : 180 }}
+                        transition={{ duration: 0.2 }}
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth="1.5"
+                            stroke="white"
+                            className="w-4 h-4 font-semibold"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="m4.5 15.75 7.5-7.5 7.5 7.5"
+                            />
+                        </svg>
+                    </motion.div>
                 </button>
                 <button
-                    onClick={() =>
+                    className="w-1/4 flex items-center"
+                    onClick={() => {
+                        const newAscend = !dateAscend;
+                        setDate(newAscend);
                         updateSyllabus(
                             getDate,
                             getDifficulty,
                             getProgress,
-                        )}
-                    className="title w-1/4"
+                            newAscend,
+                        );
+                    }}
                 >
-                    Due Date
+                    <div className="title">
+                        Due Date
+                    </div>
+                    <motion.div
+                        animate={{ rotateZ: dateAscend ? 0 : 180 }}
+                        transition={{ duration: 0.2 }}
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth="1.5"
+                            stroke="white"
+                            className="w-4 h-4 font-semibold"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="m4.5 15.75 7.5-7.5 7.5 7.5"
+                            />
+                        </svg>
+                    </motion.div>
                 </button>
                 <button
-                    onClick={() =>
+                    className="w-1/4 flex items-center"
+                    onClick={() => {
+                        const newAscend = !progressAscend;
+                        setProgress(newAscend);
                         updateSyllabus(
                             getProgress,
                             getDate,
                             getDifficulty,
-                        )}
-                    className="title w-1/4"
+                            newAscend,
+                        );
+                    }}
                 >
-                    Status
+                    <div className="title">
+                        Status
+                    </div>
+                    <motion.div
+                        animate={{ rotateZ: progressAscend ? 0 : 180 }}
+                        transition={{ duration: 0.2 }}
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth="1.5"
+                            stroke="white"
+                            className="w-4 h-4 font-semibold"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="m4.5 15.75 7.5-7.5 7.5 7.5"
+                            />
+                        </svg>
+                    </motion.div>
                 </button>
             </div>
 
@@ -69,7 +149,7 @@ const AssignmentList: React.FC<AssignmentListProps> = (
                         initial={{ opacity: 0, y: 40 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, delay: index * 0.05 }}
-                        key={index}
+                        key={`${item.task}-${item.dueDate}`}
                     >
                         <AssignmentUI
                             assignment={item}

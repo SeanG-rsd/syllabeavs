@@ -1,21 +1,13 @@
 "use client";
 
-import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
-import AssignmentUI from "../components/assignments/assignment";
 import { Assignment } from "../types/assignment";
 import Navigation from "../components/Navigation";
-import {
-  getDate,
-  getDifficulty,
-  getProgress,
-} from "@/app/util/syllabusSorting";
 import {
   getSyllabiData,
   parseSyllabusData,
   updateAssignmentData,
 } from "../api/syllabus/syllabi";
-import AddClassModal from "../components/generatePage/addClassModal";
 import AssignmentList from "../components/generatePage/assignmentList";
 import ButtonBar from "../components/generatePage/buttonBar";
 import SideBar from "../components/generatePage/classSideBar";
@@ -76,10 +68,13 @@ export default function Generate() {
     }));
   };
 
-  const updateCurrentSyllabus = (assignment: []) => {
-    syllabi[currentClass] = assignment;
-    setSyllabi(syllabi);
-    setCurrentClass(currentClass);
+  const updateCurrentSyllabus = (assignment: Assignment[]) => {
+    const updatedSyllabi = {
+      ...syllabi,
+      [currentClass]: assignment,
+    };
+
+    setSyllabi(updatedSyllabi);
     setCurrentSyllabus(assignment);
   };
 
@@ -99,24 +94,35 @@ export default function Generate() {
     first: Function,
     second: Function,
     third: Function,
+    ascending: boolean,
   ) => {
-    setCurrentSyllabus(currentSyllabus.sort((a, b) => {
-      if (first(a, b) != 0) {
-        return first(a, b);
-      } else if (second(a, b) != 0) {
-        return second(a, b);
-      }
-      return third(a, b);
-    }));
+    console.log("update syllabus: ", ascending);
+
+    const copy = [...currentSyllabus];
+    copy.sort((a, b) => {
+      let result = first(a, b);
+      if (result !== 0) return ascending ? result : -result;
+
+      result = second(a, b);
+      if (result !== 0) return ascending ? result : -result;
+
+      result = third(a, b);
+      return ascending ? result : -result;
+    });
+
+    console.log("sorted");
+    console.log("Sorted by progress:", copy.map(a => a.status));
+
+    updateCurrentSyllabus(copy);
   };
 
   const updateCurrentStatus = async (status: string, index: number) => {
-    // const response = updateAssignmentData(
-    //   status,
-    //   index,
-    //   currentClass,
-    //   currentSyllabus,
-    // );
+    updateAssignmentData(
+      status,
+      index,
+      currentClass,
+      currentSyllabus,
+    );
   };
 
   const getSyllabi = async () => {
@@ -155,7 +161,7 @@ export default function Generate() {
           <div className="mr-8">
             <Navigation />
           </div>
-          <div className="flex h-full justify-center items-center">
+          <div className="flex h-full justify-center items-center mt-2">
             {isInOverview
               ? Object.keys(syllabi).length != 0
                 ? <Overview syllabi={syllabi} />

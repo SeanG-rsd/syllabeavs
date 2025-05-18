@@ -87,7 +87,7 @@ export const updateAssignmentData = async (status: string, index: number, curren
     const token = await user.getIdToken();
 
     try {
-      const response = await fetch("https://localhost:8000/update", {
+      await fetch("http://localhost:8000/update", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

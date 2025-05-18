@@ -1,16 +1,26 @@
 import { Assignment } from "../types/assignment";
 
 export const getDifficulty = (a: Assignment, b: Assignment) => {
-    return a["difficulty"] - b["difficulty"];
+    return a.difficulty - b.difficulty;
 };
 
-export const getDate = (a: never, b: never) => {
-    return new Date(a["dueDate"]).getTime() - new Date(b["dueDate"]).getTime();
+export const getDate = (a: Assignment, b: Assignment) => {
+    return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
 };
 
-export const getProgress = (a: never, b: never) => {
-    if (a["status"] == b["status"]) return 0;
-    if (a["status"] == "In Progress") return -1;
-    if (a["status"] == "Not Started" && b["status"] == "Complete") return -1;
-    return 1;
+export const getProgress = (a: Assignment, b: Assignment) => {
+    
+    const order: { [key: string]: number } = {
+        "In Progress": 0,
+        "Not Started": 1,
+        "Complete": 2,
+    };
+
+    console.log(
+    `Comparing "${a.status}" vs "${b.status}" => ${order[a.status] - order[b.status]}`
+  );
+
+  const diff = order[a.status] - order[b.status];
+
+  return diff === 0 ? 0 : diff > 0 ? 1 : -1;
 };
