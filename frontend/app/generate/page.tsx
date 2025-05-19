@@ -172,7 +172,7 @@ export default function Generate() {
               isInOverview={isInOverview}
             >
             </SideBar>
-            <div className="h-screen col-span-4 py-10 ml-72 overflow-y-auto flex-1 ">
+            <div className="h-max col-span-4 py-10 ml-72 overflow-y-auto flex-1">
               <div className="mr-8">
                 <Navigation />
               </div>
