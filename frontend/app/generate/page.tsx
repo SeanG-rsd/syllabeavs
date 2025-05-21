@@ -14,7 +14,7 @@ import ButtonBar from "../components/generatePage/buttonBar";
 import SideBar from "../components/generatePage/classSideBar";
 import LoadingIndicator from "../components/generatePage/loadingIndicator";
 import NoClasses from "../components/generatePage/noClasses";
-import Overview from "../components/generatePage/overview";
+import Overview from "../components/overview/overview";
 import UploadSyllabus from "../components/generatePage/uploadSyllabus";
 
 export default function Generate() {
