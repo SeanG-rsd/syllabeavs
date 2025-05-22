@@ -103,6 +103,32 @@ export const updateAssignmentData = async (status: string, index: number, curren
     }
   };
 
+  export const updateSyllabus = async (className: string, currentSyllabus: Assignment[]) => {
+    const user = auth.currentUser;
+    if (!user) {
+      console.error("Not signed in");
+      return;
+    }
+
+    const token = await user.getIdToken();
+
+    try {
+      await fetch("http://localhost:8000/update", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          currentClass: className,
+          assignments: currentSyllabus,
+        }),
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   export const deleteSyllabus = async (className: string) => {
     const user = auth.currentUser;
     if (!user) {

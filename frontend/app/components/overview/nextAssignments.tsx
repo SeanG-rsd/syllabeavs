@@ -1,16 +1,19 @@
 import { Assignment } from "@/app/types/assignment";
 import { useEffect, useState } from "react";
 import OverviewAssignmentUI from "./overviewAssignmentUI";
+import { getNextAssignments } from "@/app/util/syllabusSorting";
 
 interface NextAssignmentsProps {
     syllabi: { [key: string]: Assignment[] };
+    update: (status: string, assignment: Assignment, syllabus: string) => void;
 }
 
-const NextAssignments: React.FC<NextAssignmentsProps> = ({ syllabi }) => {
-    const updateStatus = (status: string) => {
+const NextAssignments: React.FC<NextAssignmentsProps> = ({ syllabi, update }) => {
+    const updateStatus = (assignment: Assignment, className: string, status: string) => {
+        update(status, assignment, className);
     };
-
-    var ass = syllabi["test"][1];
+    
+    var nextAssignments = getNextAssignments(syllabi, 5);
 
     return (
         <div className="w-11/12 flex flex-col items-center mt-8">
@@ -19,26 +22,7 @@ const NextAssignments: React.FC<NextAssignmentsProps> = ({ syllabi }) => {
                 <div className="bg-blue-100 h-0.5 mt-0.5 w-1/2"></div>
             </h1>
             <div className="flex flex-col gap-2 w-full mt-2">
-                <OverviewAssignmentUI
-                    assignment={ass}
-                    updateStatus={updateStatus}
-                />
-                <OverviewAssignmentUI
-                    assignment={ass}
-                    updateStatus={updateStatus}
-                />
-                <OverviewAssignmentUI
-                    assignment={ass}
-                    updateStatus={updateStatus}
-                />
-                <OverviewAssignmentUI
-                    assignment={ass}
-                    updateStatus={updateStatus}
-                />
-                <OverviewAssignmentUI
-                    assignment={ass}
-                    updateStatus={updateStatus}
-                />
+                {nextAssignments.map((a) => (<OverviewAssignmentUI assignment={a} updateStatus={updateStatus} key={`${a.task}-OverviewAssignment-${a.class}`}/>))}
             </div>
         </div>
     );

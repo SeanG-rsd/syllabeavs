@@ -118,7 +118,7 @@ const Profile: React.FC<ProfileProps> = ({ close, signIn }) => {
                         className={`w-full px-4 py-2 text-white font-medium rounded-lg ${
                             isDeletingAccount
                                 ? "bg-gray-300 cursor-not-allowed"
-                                : "bg-indigo-600 hover:bg-indigo-700 hover:shadow-xl transition duration-300"
+                                : "bg-red-600 hover:bg-red-700 hover:shadow-xl transition duration-300"
                         }`}
                     >
                         {isDeletingAccount

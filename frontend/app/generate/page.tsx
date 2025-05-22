@@ -8,6 +8,7 @@ import {
   getSyllabiData,
   parseSyllabusData,
   updateAssignmentData,
+  updateSyllabus
 } from "../api/syllabus/syllabi";
 import AssignmentList from "../components/generatePage/assignmentList";
 import ButtonBar from "../components/generatePage/buttonBar";
@@ -135,6 +136,23 @@ export default function Generate() {
     );
   };
 
+  const updateSyllabusStatus = (
+    status: string,
+    assignment: Assignment,
+    syllabus: string,
+  ) => {
+    const updatedAssignments = syllabi[syllabus].map((a) =>
+    a === assignment ? { ...a, status } : a
+  );
+
+  updateSyllabus(syllabus, updatedAssignments);
+
+  setSyllabi({
+    ...syllabi,
+    [syllabus]: updatedAssignments,
+  });
+  };
+
   const getSyllabi = async () => {
     const output = await getSyllabiData();
 
@@ -161,7 +179,7 @@ export default function Generate() {
     <section className="flex min-w-screen min-h-screen bg-[#292929]">
       {loaded
         ? (
-          <div className="h-full w-full overflow-hidden">
+          <div className="w-full overflow-hidden">
             <SideBar
               syllabi={syllabi}
               currentClass={currentClass}
@@ -172,14 +190,19 @@ export default function Generate() {
               isInOverview={isInOverview}
             >
             </SideBar>
-            <div className="h-max col-span-4 py-10 ml-72 overflow-y-auto flex-1">
+            <div className="col-span-4 ml-72 h-screen overflow-y-auto flex flex-col py-6">
               <div className="mr-8">
                 <Navigation />
               </div>
-              <div className="flex h-full justify-center items-center mt-2">
+              <div className="flex-1 flex justify-center items-center mt-2">
                 {isInOverview
                   ? Object.keys(syllabi).length != 0
-                    ? <Overview syllabi={syllabi} />
+                    ? (
+                      <Overview
+                        syllabi={syllabi}
+                        update={updateSyllabusStatus}
+                      />
+                    )
                     : <NoClasses addClass={addClass} />
                   : (currentSyllabus.length === 0
                     ? (

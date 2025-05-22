@@ -82,13 +82,13 @@ const OverviewTotalProgress: React.FC<OverviewTotalProgressProps> = (
                             100 - (completePercent + inProgressPercent)
                         }`}
                     />
-                    <text x="21" y="21" fill="white" fontSize="4" textAnchor="middle" dominantBaseline="central">1000 / 1000</text>
+                    <text x="21" y="21" fill="white" fontSize="5" fontWeight="semibold" textAnchor="middle" dominantBaseline="central">{completePercent}%</text>
                 </svg>
             </div>
             <div className="flex w-full justify-around py-4 text-lg text-white">
-                <h1 className="p-4 border-black rounded-lg box-shadow-red">Not Started: 10</h1>
-                <h1 className="p-4 border-black rounded-lg box-shadow-orange">In Progress: 10</h1>
-                <h1 className="p-4 border-black rounded-lg box-shadow-green">Complete: 10</h1>
+                <h1 className="p-4 border-black rounded-lg box-shadow-red">Not Started: {info["Not Started"]}</h1>
+                <h1 className="p-4 border-black rounded-lg box-shadow-orange">In Progress: {info["In Progress"]}</h1>
+                <h1 className="p-4 border-black rounded-lg box-shadow-green">Complete: {info["Complete"]}</h1>
             </div>
         </div>
     );

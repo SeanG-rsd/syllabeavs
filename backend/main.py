@@ -1,7 +1,9 @@
-from fastapi import FastAPI, Request, File, UploadFile, Depends
+from fastapi import FastAPI, Request, File, UploadFile, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from openai import OpenAI
-import PyPDF2
+from docx import Document
+from PyPDF2 import PdfReader
+from io import BytesIO
 import os
 from dotenv import load_dotenv
 import io
@@ -30,6 +32,7 @@ Put each individual task in its own line. Include only the columns headers and t
 All tasks can be given 1 of 4 statuses, "Not Started", "In Progress", "Blocked", or "Completed". For this course all tasks will be assigned "Not Started".
 For reference, Monday of Week 1 is 3/31/25 and Sunday of Week 1 is 4/6/25. The course lasts for 10 weeks, make sure to include every week's assignments
 Do not output any information except for the JSON formatted file. Output into the given JSON format below:
++ Set the "class" field in each assignment to the exact class name provided earlier by the user input. Do not generate or infer a different name.
 
 Assignment JSON:
 {
@@ -126,8 +129,21 @@ async def update_syllabi(request: Request, user_data: dict = Depends(verify_toke
 async def recieve_syllabus(request: Request, file: UploadFile, user_data: dict = Depends(verify_token)):
     name = request.headers.get("ClassName")
     contents = await file.read()
-    text = extract_text_from_pdf(contents)
-    parsed = json.loads(parse_syllabus(text))
+    filename = file.filename.lower()
+
+    if filename.endswith(".pdf"):
+        text = extract_text_from_pdf(contents)
+    elif filename.endswith(".docx"):
+        text = extract_text_from_docx(contents)
+    elif filename.endswith(".txt"):
+        text = extract_text_from_txt(contents)
+    else:
+        raise HTTPException(status_code=400, detail="Unsupported file type")
+    
+    parsed = json.loads(parse_syllabus(text, name))
+
+    for x in parsed["assignments"]:
+        x["class"] = name
    
     if (user_data != None):
         user_id = user_data["uid"]
@@ -135,19 +151,25 @@ async def recieve_syllabus(request: Request, file: UploadFile, user_data: dict =
 
     return {"message": json.dumps(parsed["assignments"])}
 
-def extract_text_from_pdf(file):
-    text = ""
-    reader = PyPDF2.PdfReader(io.BytesIO(file))
-    for page in reader.pages:
-        page_text = page.extract_text()
-        if page_text:
-            text += page_text
-    return text
+def extract_text_from_docx(contents: bytes) -> str:
+    doc = Document(BytesIO(contents))
+    return "\n".join(p.text for p in doc.paragraphs)
 
-def parse_syllabus(text):
+def extract_text_from_txt(contents: bytes) -> str:
+    return contents.decode('utf-8')
+
+def extract_text_from_pdf(contents: bytes) -> str:
+    reader = PdfReader(BytesIO(contents))
+    return "\n".join(page.extract_text() for page in reader.pages)
+
+def parse_syllabus(text, className):
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
+            {
+                "role": "user",
+                "content": f"This is the class name: {className}"
+            },
             {
                 "role":"system",
                 "content": syllabusQuery
@@ -158,5 +180,9 @@ def parse_syllabus(text):
             }
         ],
     )
-    return response.choices[0].message.content
+    
+    raw = response.choices[0].message.content.strip()
+    fixed_json = raw.replace("'", '"')
+
+    return fixed_json
 

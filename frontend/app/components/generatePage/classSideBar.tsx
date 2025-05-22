@@ -79,10 +79,13 @@ const SideBar: React.FC<SideBarProps> = (
                                         <h1>
                                             {name}
                                         </h1>
-                                        <button
+                                        <div
+                                            role="button"
                                             className="bg-transparent"
-                                            onClick={() =>
-                                                openDeleteClass(name)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                openDeleteClass(name);
+                                            }}
                                         >
                                             <div className="w-6 h-6 flex items-center justify-center hover:cursor-pointer">
                                                 <svg
@@ -100,7 +103,7 @@ const SideBar: React.FC<SideBarProps> = (
                                                     />
                                                 </svg>
                                             </div>
-                                        </button>
+                                        </div>
                                     </div>
                                 </button>
                             )
@@ -111,13 +114,16 @@ const SideBar: React.FC<SideBarProps> = (
                                     onClick={() => selectClass(name)}
                                 >
                                     <div className="w-full flex items-center justify-between">
-                                    <h1>
-                                        {name}
-                                    </h1>
-                                        <button
+                                        <h1>
+                                            {name}
+                                        </h1>
+                                        <div
+                                            role="button"
                                             className="bg-transparent"
-                                            onClick={() =>
-                                                openDeleteClass(name)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                openDeleteClass(name);
+                                            }}
                                         >
                                             <div className="w-6 h-6 flex items-center justify-center hover:cursor-pointer">
                                                 <svg
@@ -135,7 +141,7 @@ const SideBar: React.FC<SideBarProps> = (
                                                     />
                                                 </svg>
                                             </div>
-                                        </button>
+                                        </div>
                                     </div>
                                 </button>
                             )

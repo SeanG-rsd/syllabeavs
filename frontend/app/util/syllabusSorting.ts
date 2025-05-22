@@ -24,3 +24,48 @@ export const getProgress = (a: Assignment, b: Assignment) => {
 
   return diff === 0 ? 0 : diff > 0 ? 1 : -1;
 };
+
+export const getNextAssignments = (syllabi: { [key: string]: Assignment[] }, numAssignments: number) => {
+    var allAssignments = [];
+
+    for (var s in syllabi) {
+        var syllabus = syllabi[s];
+
+        allAssignments.push(...syllabus);
+    }
+
+    const sorted = sortSyllabus(allAssignments);
+
+    var output = [];
+
+    var count = 0;
+    var i = 0;
+
+    while (count < numAssignments && i < sorted.length) {
+        if (sorted[i].status != "Complete") {
+            output.push(sorted[i]);
+            count++;
+        }
+        i++;
+    }
+
+    return output;
+}
+
+const sortSyllabus = (
+    syllabus: Assignment[]
+  ) => {
+    const copy = [...syllabus];
+    copy.sort((a, b) => {
+      let result = getDate(a, b);
+      if (result !== 0) return result;
+
+      result = getProgress(a, b);
+      if (result !== 0) return result;
+
+      result = getDifficulty(a, b);
+      return result;
+    });
+
+    return copy;    
+  };

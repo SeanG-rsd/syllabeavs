@@ -3,16 +3,17 @@ interface UploadSyllabusProps {
 }
 
 const UploadSyllabus: React.FC<UploadSyllabusProps> = ({parseSyllabus}) => {
-    return (<div className="flex h-fit items-center justify-center">
+    return (<div className="flex justify-center items-center w-full h-full">
                         <input
                           type="file"
+                          accept=".pdf,.txt,.docx"
                           onChange={parseSyllabus}
                           className="hidden"
                           id="file-upload"
                         />
                         <label
                           htmlFor="file-upload"
-                          className="h-full p-24 space-y-10 cursor-pointer border border-dashed border-slate-200 border-spacing-7 rounded-xl"
+                          className="p-24 space-y-10 cursor-pointer border border-dashed border-slate-200 border-spacing-7 rounded-xl"
                         >
                           <div className="flex justify-center items-center">
                             <svg

@@ -4,7 +4,7 @@ import { Assignment } from "@/app/types/assignment";
 
 interface AssignmentProps {
   assignment: Assignment;
-  updateStatus: (status: string) => void;
+  updateStatus: (assignment: Assignment, className: string, status: string) => void;
 }
 
 const OverviewAssignmentUI: React.FC<AssignmentProps> = ({
@@ -21,7 +21,7 @@ const OverviewAssignmentUI: React.FC<AssignmentProps> = ({
     else if (assignmentState == "In Progress") setStateColor("text-[var(--color-inprogress)]");
     else if (assignmentState == "Complete") setStateColor("text-[var(--color-complete)]");
     if (isLoaded) {
-      updateStatus(assignmentState);
+      updateStatus(assignment, assignment.class, assignmentState);
     } else { setLoaded(true); }
   }, [assignmentState]);
 
@@ -48,6 +48,7 @@ const OverviewAssignmentUI: React.FC<AssignmentProps> = ({
 
   return (
     <div className="rounded-lg flex items-center justify-center w-full">
+      <p className="info w-1/3 text-white text-sm">{assignment.class}</p>
       <p className="info w-1/3 text-white text-sm">{assignment.task}</p>
       <div className="info flex w-1/4 text-slate-400">{elements}</div>
       <p className="info w-1/6 text-slate-400">{assignment.dueDate}</p>
