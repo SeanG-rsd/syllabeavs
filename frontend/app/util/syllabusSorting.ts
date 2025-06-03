@@ -9,23 +9,21 @@ export const getDate = (a: Assignment, b: Assignment) => {
 };
 
 export const getProgress = (a: Assignment, b: Assignment) => {
-    
     const order: { [key: string]: number } = {
         "In Progress": 0,
         "Not Started": 1,
         "Complete": 2,
     };
 
-    console.log(
-    `Comparing "${a.status}" vs "${b.status}" => ${order[a.status] - order[b.status]}`
-  );
+    const diff = order[a.status] - order[b.status];
 
-  const diff = order[a.status] - order[b.status];
-
-  return diff === 0 ? 0 : diff > 0 ? 1 : -1;
+    return diff === 0 ? 0 : diff > 0 ? 1 : -1;
 };
 
-export const getNextAssignments = (syllabi: { [key: string]: Assignment[] }, numAssignments: number) => {
+export const getNextAssignments = (
+    syllabi: { [key: string]: Assignment[] },
+    numAssignments: number,
+) => {
     var allAssignments = [];
 
     for (var s in syllabi) {
@@ -50,22 +48,22 @@ export const getNextAssignments = (syllabi: { [key: string]: Assignment[] }, num
     }
 
     return output;
-}
+};
 
 const sortSyllabus = (
-    syllabus: Assignment[]
-  ) => {
+    syllabus: Assignment[],
+) => {
     const copy = [...syllabus];
     copy.sort((a, b) => {
-      let result = getDate(a, b);
-      if (result !== 0) return result;
+        let result = getDate(a, b);
+        if (result !== 0) return result;
 
-      result = getProgress(a, b);
-      if (result !== 0) return result;
+        result = getProgress(a, b);
+        if (result !== 0) return result;
 
-      result = getDifficulty(a, b);
-      return result;
+        result = getDifficulty(a, b);
+        return result;
     });
 
-    return copy;    
-  };
+    return copy;
+};

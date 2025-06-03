@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request, File, UploadFile, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 from openai import OpenAI
 from docx import Document
 from PyPDF2 import PdfReader
@@ -8,6 +9,9 @@ import os
 from dotenv import load_dotenv
 import io
 import logging
+from googleapiclient.discovery import build
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import Flow
 from firebase_admin import firestore, db as realtimedb
 from firebase_admin import credentials, initialize_app, auth
 import json
@@ -64,6 +68,66 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
+REDIRECT_URI = "http://localhost:8000/oauth2callback"
+
+@app.get("/oauth2callback")
+async def oauth2callback(request: Request):
+    user_uid = request.query_params.get("uid")
+
+    code = request.query_params.get("code")
+    flow = Flow.from_client_config(
+        {
+            "web": {
+                "client_id": GOOGLE_CLIENT_ID,
+                "client_secret": GOOGLE_CLIENT_SECRET,
+                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token",
+            }
+        },
+        scopes=["https://www.googleapis.com/auth/calendar.events"],
+        redirect_uri=REDIRECT_URI,
+    )
+    flow.fetch_token(code=code)
+    creds = flow.credentials
+
+    # 🔒 Save tokens to Firestore
+    token_data = {
+        "access_token": creds.token,
+        "refresh_token": creds.refresh_token,
+        "expiry": creds.expiry.isoformat(),
+        "calendarConnected": True
+    }
+    db.collection("users").document(user_uid).set({"calendar_tokens": token_data}, merge=True)
+
+    return RedirectResponse(url="http://localhost:3000/success")  # Redirect to frontend
+
+@app.get("/addevents")
+def add_all_to_calendar(request: Request):
+    user_uid = request.query_params.get("uid")
+
+    doc_ref = db.collection("users").document(user_uid)
+    doc = doc_ref.get()
+    tokens = doc.to_dict()["calendar_tokens"]
+
+    creds = Credentials(
+    tokens["access_token"],
+    refresh_token=tokens["refresh_token"],
+    token_uri="https://oauth2.googleapis.com/token",
+    client_id=GOOGLE_CLIENT_ID,
+    client_secret=GOOGLE_CLIENT_SECRET,
+    )
+
+# Use creds with Google Calendar API
+    service = build("calendar", "v3", credentials=creds)
+    event = {
+        'summary': "Test Assignment",
+        'start': {'dateTime': "2025-06-05T15:00:00-07:00", 'timeZone': 'America/Los_Angeles'},
+        'end': {'dateTime': "2025-06-05T16:00:00-07:00", 'timeZone': 'America/Los_Angeles'},
+    }
+    service.events().insert(calendarId='primary', body=event).execute()
 
 @app.get("/")
 def read_root():

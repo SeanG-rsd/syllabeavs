@@ -1,3 +1,5 @@
+import { connectGoogleCalendar } from "@/app/api/firebase/auth";
+
 const ButtonBar = () => {
     return (
         <div className="ml-4 flex gap-6">
@@ -20,7 +22,7 @@ const ButtonBar = () => {
                     </svg>
                 </div>
             </button>
-            <button className="flex justify-start">
+            <button className="flex justify-start" onClick={connectGoogleCalendar}>
                 <div className="p-2 pl-4 pr-2 bg-white rounded-lg flex gap-2">
                     <p>Add to Calendar</p>
                     <svg
