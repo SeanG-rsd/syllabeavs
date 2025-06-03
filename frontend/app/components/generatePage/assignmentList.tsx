@@ -19,11 +19,15 @@ interface AssignmentListProps {
         status: string,
         index: number,
     ) => void;
+    updateDate: (
+        date: Date,
+        index: number
+    ) => void;
     syllabus: Assignment[];
 }
 
 const AssignmentList: React.FC<AssignmentListProps> = (
-    { updateSyllabus, updateStatus, syllabus },
+    { updateSyllabus, updateStatus, updateDate, syllabus },
 ) => {
     const [dateAscend, setDate] = useState(false);
     const [diffAscend, setDiff] = useState(false);
@@ -156,6 +160,7 @@ const AssignmentList: React.FC<AssignmentListProps> = (
                             updateStatus={(status) => {
                                 updateStatus(status, index);
                             }}
+                            updateDate={(date) => {updateDate(date, index);}}
                         />
                     </motion.div>
                 ))}

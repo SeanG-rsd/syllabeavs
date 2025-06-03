@@ -7,7 +7,8 @@ import {
   deleteSyllabus,
   getSyllabiData,
   parseSyllabusData,
-  updateAssignmentData,
+  updateAssignmentStatus,
+  updateAssignmentDate,
   updateSyllabus
 } from "../api/syllabus/syllabi";
 import AssignmentList from "../components/generatePage/assignmentList";
@@ -128,13 +129,22 @@ export default function Generate() {
   };
 
   const updateCurrentStatus = async (status: string, index: number) => {
-    updateAssignmentData(
+    updateAssignmentStatus(
       status,
       index,
       currentClass,
       currentSyllabus,
     );
   };
+
+  const updateCurrentDate = (date: Date, index: number) => {
+    updateAssignmentDate(
+      date,
+      index,
+      currentClass,
+      currentSyllabus
+    );
+  }
 
   const updateSyllabusStatus = (
     status: string,
@@ -217,6 +227,7 @@ export default function Generate() {
                           updateSyllabus={sortCurrentSyllabus}
                           syllabus={currentSyllabus}
                           updateStatus={updateCurrentStatus}
+                          updateDate={updateCurrentDate}
                         />
                       </div>
                     ))}

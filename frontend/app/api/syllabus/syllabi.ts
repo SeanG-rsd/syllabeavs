@@ -73,10 +73,40 @@ export const getSyllabiData = async () => {
     }
   };
 
-export const updateAssignmentData = async (status: string, index: number, currentClass: string, currentSyllabus: Assignment[]) => {
+export const updateAssignmentStatus = async (status: string, index: number, currentClass: string, currentSyllabus: Assignment[]) => {
     console.log(`${status} for assignment ${index}`);
 
     currentSyllabus[index].status = status;
+
+    const user = auth.currentUser;
+    if (!user) {
+      console.error("Not signed in");
+      return;
+    }
+
+    const token = await user.getIdToken();
+
+    try {
+      await fetch("http://localhost:8000/update", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          currentClass: currentClass,
+          assignments: currentSyllabus,
+        }),
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  export const updateAssignmentDate = async (date: Date, index: number, currentClass: string, currentSyllabus: Assignment[]) => {
+    console.log(date.toLocaleDateString("en", {year: "2-digit", month: "2-digit", day: "2-digit"}));
+
+    currentSyllabus[index].dueDate = date.toLocaleDateString("en", {year: "2-digit", month: "2-digit", day: "2-digit"});
 
     const user = auth.currentUser;
     if (!user) {

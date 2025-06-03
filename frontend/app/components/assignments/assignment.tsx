@@ -1,20 +1,28 @@
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { Assignment } from "@/app/types/assignment";
+import DateChangePopup from "./dateChangePopup";
 
 interface AssignmentProps {
   assignment: Assignment;
   updateStatus: (status: string) => void;
+  updateDate: (date: Date) => void;
 }
 
 const AssignmentUI: React.FC<AssignmentProps> = ({
   assignment,
   updateStatus,
+  updateDate
 }) => {
   const [assignmentState, setAssignmentState] = useState(assignment.status);
   const [stateColor, setStateColor] = useState("text-red-600");
+  const [datePopup, setDatePopup] = useState(false);
 
   const [isLoaded, setLoaded] = useState(false);
+
+  const closeDatePopup = () => {
+    setDatePopup(false);
+  }
 
   useEffect(() => {
     if (assignmentState == "Not Started") setStateColor("text-red-600");
@@ -22,14 +30,14 @@ const AssignmentUI: React.FC<AssignmentProps> = ({
     else if (assignmentState == "Complete") setStateColor("text-green-600");
     if (isLoaded) {
       updateStatus(assignmentState);
-    } else { setLoaded(true); }
+    } else setLoaded(true);
   }, [assignmentState]);
 
   const elements = [];
   for (let i = 0; i < assignment.difficulty; i++) {
     elements.push(
       <svg
-      key={i}
+        key={i}
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
@@ -50,7 +58,15 @@ const AssignmentUI: React.FC<AssignmentProps> = ({
     <div className="m-4 rounded-lg flex items-center justify-center text-center">
       <p className="info w-1/3 text-white">{assignment.task}</p>
       <div className="info flex w-1/6 text-slate-400">{elements}</div>
-      <p className="info w-1/4 text-slate-400">{assignment.dueDate}</p>
+      <div className="w-1/4">
+        <button
+          className="info text-slate-400 hover:cursor-pointer text-start w-full"
+          onClick={() => setDatePopup(!datePopup)}
+        >
+          {assignment.dueDate}
+        </button>
+        {datePopup ? <DateChangePopup dueDate={new Date(assignment.dueDate)} setNewDate={updateDate} close={closeDatePopup}/> : <div></div>}
+      </div>
       <div
         className={`info w-1/4 flex items-center group relative ${stateColor} hover:cursor-pointer`}
       >
