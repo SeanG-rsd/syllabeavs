@@ -63,7 +63,7 @@ NO QUOTATION MARKS
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -72,73 +72,6 @@ app.add_middleware(
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 REDIRECT_URI = "http://localhost:8000/oauth2callback"
-
-@app.get("/oauth2callback")
-async def oauth2callback(request: Request):
-    user_uid = request.query_params.get("uid")
-
-    code = request.query_params.get("code")
-    flow = Flow.from_client_config(
-        {
-            "web": {
-                "client_id": GOOGLE_CLIENT_ID,
-                "client_secret": GOOGLE_CLIENT_SECRET,
-                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                "token_uri": "https://oauth2.googleapis.com/token",
-            }
-        },
-        scopes=["https://www.googleapis.com/auth/calendar.events"],
-        redirect_uri=REDIRECT_URI,
-    )
-    flow.fetch_token(code=code)
-    creds = flow.credentials
-
-    # 🔒 Save tokens to Firestore
-    token_data = {
-        "access_token": creds.token,
-        "refresh_token": creds.refresh_token,
-        "expiry": creds.expiry.isoformat(),
-        "calendarConnected": True
-    }
-    db.collection("users").document(user_uid).set({"calendar_tokens": token_data}, merge=True)
-
-    return RedirectResponse(url="http://localhost:3000/success")  # Redirect to frontend
-
-@app.get("/addevents")
-def add_all_to_calendar(request: Request):
-    user_uid = request.query_params.get("uid")
-
-    doc_ref = db.collection("users").document(user_uid)
-    doc = doc_ref.get()
-    tokens = doc.to_dict()["calendar_tokens"]
-
-    creds = Credentials(
-    tokens["access_token"],
-    refresh_token=tokens["refresh_token"],
-    token_uri="https://oauth2.googleapis.com/token",
-    client_id=GOOGLE_CLIENT_ID,
-    client_secret=GOOGLE_CLIENT_SECRET,
-    )
-
-# Use creds with Google Calendar API
-    service = build("calendar", "v3", credentials=creds)
-    event = {
-        'summary': "Test Assignment",
-        'start': {'dateTime': "2025-06-05T15:00:00-07:00", 'timeZone': 'America/Los_Angeles'},
-        'end': {'dateTime': "2025-06-05T16:00:00-07:00", 'timeZone': 'America/Los_Angeles'},
-    }
-    service.events().insert(calendarId='primary', body=event).execute()
-
-@app.get("/")
-def read_root():
-    return {"message": "Hello World"}
-
-@app.post("/generate")
-async def receive_string(request: Request):
-    logging.debug(f"Received file:")
-    body = await request.body()
-    text = body.decode()
-    return {"message": f"Test: {text}"}
 
 async def verify_token(request: Request):
     auth_header = request.headers.get("Authorization")
@@ -151,6 +84,84 @@ async def verify_token(request: Request):
         return decoded_token
     except Exception:
         return None
+
+@app.get("/oauth2callback")
+async def oauth2callback(request: Request):
+    code = request.query_params.get("code")
+    return RedirectResponse(url=f"http://localhost:3000/success?code={code}")
+
+@app.post("/store_google_tokens")
+async def setup_calendar(request: Request):
+    body = await request.json()
+    uid = body.get("uid")
+    code = body.get("code")
+
+    if not uid or not code:
+        raise HTTPException(status_code=400, detail="Missing uid or code")
+
+    flow = Flow.from_client_config(
+        {
+            "web": {
+                "client_id": GOOGLE_CLIENT_ID,
+                "client_secret": GOOGLE_CLIENT_SECRET,
+                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/auth/t",
+            }
+        },
+        scopes=["https://www.googleapis.com/auth/tasks"],
+        redirect_uri="http://localhost:8000/oauth2callback"
+    )
+
+    flow.fetch_token(code=code)
+    creds = flow.credentials
+
+    db.collection("users").document(uid).set({
+        "calendar_tokens": {
+            "access_token": creds.token,
+            "refresh_token": creds.refresh_token,
+            "expiry": creds.expiry.isoformat(),
+            "calendarConnected": True
+        }
+    }, merge=True)
+
+    return { "status": "success" }
+
+@app.get("/add_events")
+def add_all_to_calendar(request: Request, user_data: dict = Depends(verify_token)):
+    if (user_data != None):
+        user_uid = user_data["uid"]
+
+        doc_ref = db.collection("users").document(user_uid)
+        doc = doc_ref.get()
+        tokens = doc.to_dict()["calendar_tokens"]
+
+        creds = Credentials(
+            tokens["access_token"],
+            refresh_token=tokens["refresh_token"],
+            token_uri="https://oauth2.googleapis.com/token",
+            client_id=GOOGLE_CLIENT_ID,
+            client_secret=GOOGLE_CLIENT_SECRET,
+        )
+
+        service = build("tasks", "v1", credentials=creds)
+        task = {
+        'title': 'Finish HST essay',
+        'notes': 'Due Friday at noon',
+        'due': '2025-06-06T23:59:00.000Z',
+        }
+        #service.events().insert(calendarId='primary', body=event).execute()
+        service.tasks().insert(tasklist='@default', body=task).execute()
+
+@app.get("/")
+def read_root():
+    return {"message": "Hello World"}
+
+@app.post("/generate")
+async def receive_string(request: Request):
+    logging.debug(f"Received file:")
+    body = await request.body()
+    text = body.decode()
+    return {"message": f"Test: {text}"}
 
 @app.get("/syllabi")
 async def get_syllabi(request: Request, user_data: dict = Depends(verify_token)):

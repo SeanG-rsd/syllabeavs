@@ -1,4 +1,4 @@
-import { connectGoogleCalendar } from "@/app/api/firebase/auth";
+import { connectGoogleCalendar } from "@/app/api/google/calendar";
 
 const ButtonBar = () => {
     return (

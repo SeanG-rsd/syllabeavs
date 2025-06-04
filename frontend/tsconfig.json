@@ -33,7 +33,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-, "app/api/firebase/firebase.js", "app/api/firebase/auth.js", "app/components/auth/login.tsx"  ],
+, "app/api/firebase/firebase.js", "app/api/firebase/auth.js", "app/components/auth/login.tsx", "app/api/google/calendar.js"  ],
   "exclude": [
     "node_modules"
   ]
