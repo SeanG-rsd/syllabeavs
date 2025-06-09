@@ -18,6 +18,7 @@ import LoadingIndicator from "../components/generatePage/loadingIndicator";
 import NoClasses from "../components/generatePage/noClasses";
 import Overview from "../components/overview/overview";
 import UploadSyllabus from "../components/generatePage/uploadSyllabus";
+import { connectGoogleCalendar, isAlreadyAddedToCalendar } from "@/app/api/google/calendar";
 
 export default function Generate() {
   const [currentSyllabus, setCurrentSyllabus] = useState<Assignment[]>([]);
@@ -222,7 +223,7 @@ export default function Generate() {
                     )
                     : (
                       <div className="w-full h-full items-center mt-10">
-                        <ButtonBar />
+                        <ButtonBar currentClass={currentClass} currentSyllabus={currentSyllabus}/>
                         <AssignmentList
                           updateSyllabus={sortCurrentSyllabus}
                           syllabus={currentSyllabus}

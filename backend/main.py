@@ -15,6 +15,7 @@ from google_auth_oauthlib.flow import Flow
 from firebase_admin import firestore, db as realtimedb
 from firebase_admin import credentials, initialize_app, auth
 import json
+from datetime import datetime, timezone
 
 load_dotenv()
 api_key = os.getenv("API_KEY")
@@ -105,7 +106,7 @@ async def setup_calendar(request: Request):
                 "client_id": GOOGLE_CLIENT_ID,
                 "client_secret": GOOGLE_CLIENT_SECRET,
                 "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                "token_uri": "https://oauth2.googleapis.com/auth/t",
+                "token_uri": "https://oauth2.googleapis.com/token",
             }
         },
         scopes=["https://www.googleapis.com/auth/tasks"],
@@ -126,8 +127,8 @@ async def setup_calendar(request: Request):
 
     return { "status": "success" }
 
-@app.get("/add_events")
-def add_all_to_calendar(request: Request, user_data: dict = Depends(verify_token)):
+@app.post("/add_events")
+async def add_all_to_calendar(request: Request, user_data: dict = Depends(verify_token)):
     if (user_data != None):
         user_uid = user_data["uid"]
 
@@ -144,13 +145,26 @@ def add_all_to_calendar(request: Request, user_data: dict = Depends(verify_token
         )
 
         service = build("tasks", "v1", credentials=creds)
-        task = {
-        'title': 'Finish HST essay',
-        'notes': 'Due Friday at noon',
-        'due': '2025-06-06T23:59:00.000Z',
-        }
-        #service.events().insert(calendarId='primary', body=event).execute()
-        service.tasks().insert(tasklist='@default', body=task).execute()
+
+        syllabus = await request.json()
+
+        for assignment in syllabus["assignments"]:
+
+            dt = datetime.strptime(assignment["dueDate"], "%m/%d/%Y")
+
+            dt = dt.replace(hour=23, minute=59, second=0, tzinfo=timezone.utc)
+
+            google_due = dt.isoformat().replace('+00:00', 'Z')
+            task = {
+                'title': assignment["task"],
+                'due': google_due,
+                'notes': f"Difficulty: {assignment["difficulty"]}"
+            }
+
+            service.tasks().insert(tasklist='@default', body=task).execute()
+        
+        user_id = user_data["uid"]
+        db.collection("users").document(user_id).collection("syllabi").document(syllabus["class"]).set({"assignments": syllabus["assignments"], "addedToCalendar": True})
 
 @app.get("/")
 def read_root():
@@ -175,9 +189,6 @@ async def get_syllabi(request: Request, user_data: dict = Depends(verify_token))
             doc_data["className"] = document_snapshot.id
             data.append(doc_data)
 
-
-        print("barrier")
-        print(json.dumps(data, indent=4))
         return {"syllabi": data}
 
     return {}
@@ -222,7 +233,7 @@ async def recieve_syllabus(request: Request, file: UploadFile, user_data: dict =
    
     if (user_data != None):
         user_id = user_data["uid"]
-        db.collection("users").document(user_id).collection("syllabi").document(name).set({"assignments": parsed["assignments"]})
+        db.collection("users").document(user_id).collection("syllabi").document(name).set({"assignments": parsed["assignments"], "addedToCalendar": False})
 
     return {"message": json.dumps(parsed["assignments"])}
 

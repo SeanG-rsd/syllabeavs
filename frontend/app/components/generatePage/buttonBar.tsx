@@ -1,6 +1,33 @@
-import { connectGoogleCalendar } from "@/app/api/google/calendar";
+"use client";
 
-const ButtonBar = () => {
+import {
+    connectGoogleCalendar,
+    isAlreadyAddedToCalendar,
+} from "@/app/api/google/calendar";
+import { Assignment } from "@/app/types/assignment";
+import { useState } from "react";
+
+interface ButtonBarProps {
+    currentClass: string;
+    currentSyllabus: Assignment[];
+}
+
+const ButtonBar: React.FC<ButtonBarProps> = (
+    { currentClass, currentSyllabus },
+) => {
+    const [calendar, setCalendar] = useState(false);
+    const [connected, setConnected] = useState(false);
+
+    const addToCalendar = async () => {
+        var isAdded = await isAlreadyAddedToCalendar(currentClass);
+        console.log(isAdded);
+
+        await connectGoogleCalendar(currentSyllabus, currentClass);
+
+        isAdded = await isAlreadyAddedToCalendar(currentClass);
+        setCalendar(isAdded);
+    };
+
     return (
         <div className="ml-4 flex gap-6">
             <button className="flex justify-start">
@@ -22,9 +49,9 @@ const ButtonBar = () => {
                     </svg>
                 </div>
             </button>
-            <button className="flex justify-start" onClick={connectGoogleCalendar}>
+            <button className="flex justify-start" onClick={addToCalendar}>
                 <div className="p-2 pl-4 pr-2 bg-white rounded-lg flex gap-2">
-                    <p>Add to Calendar</p>
+                    <p>{calendar ? "Connect Calendar" : "Add to Calendar"}</p>
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"

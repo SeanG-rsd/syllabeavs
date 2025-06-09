@@ -6,7 +6,7 @@ import { userInfo } from 'os';
 
 dotenv.config();
 
-export const connectGoogleCalendar = async () => {
+export const connectGoogleCalendar = async (assignments, currentClass) => {
 
     const authorized = await isAuthorizedForCalendar();
 
@@ -34,20 +34,50 @@ export const connectGoogleCalendar = async () => {
 
         const token = await user.getIdToken();
 
-        await fetch("http://localhost:8000/add_events", {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
+        const isAdded = await isAlreadyAddedToCalendar(currentClass);
+
+        if (!isAdded) {
+
+            console.log("ADD TASKS");
+            await fetch("http://localhost:8000/add_events", {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ assignments: assignments, class: currentClass })
+            });
+        }
 
     }
+};
+
+export const isAlreadyAddedToCalendar = async (className) => {
+    const user = auth.currentUser;
+
+    if (!user) {
+        console.error("User not authenticated.");
+        return true;
+    }
+
+    const userUid = user.uid;
+
+    const syllabusRef = doc(db, "users", userUid, "syllabi", className);
+    const syllabusSnap = await getDoc(syllabusRef);
+
+    if (!syllabusSnap.exists()) {
+        console.warn(`Syllabus ${className} does not exist for user ${userUid}`);
+        return true;
+    }
+
+    return syllabusSnap.data()["addedToCalendar"] ?? true;
 };
 
 export const isAuthorizedForCalendar = async () => {
 
     const userUid = auth.currentUser.uid;
     const userRef = doc(db, "users", userUid);
+
     const userSnap = await getDoc(userRef);
 
     if (userSnap.exists()) {
