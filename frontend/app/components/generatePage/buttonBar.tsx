@@ -3,9 +3,10 @@
 import {
     connectGoogleCalendar,
     isAlreadyAddedToCalendar,
+    isAuthorizedForCalendar,
 } from "@/app/api/google/calendar";
 import { Assignment } from "@/app/types/assignment";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface ButtonBarProps {
     currentClass: string;
@@ -18,19 +19,36 @@ const ButtonBar: React.FC<ButtonBarProps> = (
     const [calendar, setCalendar] = useState(false);
     const [connected, setConnected] = useState(false);
 
-    const addToCalendar = async () => {
+    const [loaded, setLoaded] = useState(false);
+
+    useEffect(() => {
+        if (!loaded) {
+            loadBar();
+        }
+    });
+
+    const loadBar = async () => {
         var isAdded = await isAlreadyAddedToCalendar(currentClass);
-        console.log(isAdded);
-
-        await connectGoogleCalendar(currentSyllabus, currentClass);
-
-        isAdded = await isAlreadyAddedToCalendar(currentClass);
         setCalendar(isAdded);
+
+        var isConnected = await isAuthorizedForCalendar();
+        setConnected(isConnected);
+
+        setLoaded(true);
+    };
+
+    const addToCalendar = async () => {
+        if (loaded) {
+            await connectGoogleCalendar(currentSyllabus, currentClass);
+
+            var isAdded = await isAlreadyAddedToCalendar(currentClass);
+            setCalendar(isAdded);
+        }
     };
 
     return (
         <div className="ml-4 flex gap-6">
-            <button className="flex justify-start">
+            {/* <button className="flex justify-start">
                 <div className="p-2 pl-4 pr-2 bg-white rounded-lg flex gap-2">
                     <p>Export</p>
                     <svg
@@ -48,10 +66,16 @@ const ButtonBar: React.FC<ButtonBarProps> = (
                         />
                     </svg>
                 </div>
-            </button>
+            </button> */}
             <button className="flex justify-start" onClick={addToCalendar}>
                 <div className="p-2 pl-4 pr-2 bg-white rounded-lg flex gap-2">
-                    <p>{calendar ? "Connect Calendar" : "Add to Calendar"}</p>
+                    <p>
+                        {loaded ? !connected
+                            ? "Connect Calendar"
+                            : (calendar
+                                ? "Added to Calendar!"
+                                : "Add to Calendar") : "Loading..."}
+                    </p>
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
