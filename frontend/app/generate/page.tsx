@@ -9,7 +9,8 @@ import {
   parseSyllabusData,
   updateAssignmentStatus,
   updateAssignmentDate,
-  updateSyllabus
+  updateSyllabus,
+  canParseSyllabus
 } from "../api/syllabus/syllabi";
 import AssignmentList from "../components/generatePage/assignmentList";
 import ButtonBar from "../components/generatePage/buttonBar";
@@ -167,6 +168,8 @@ export default function Generate() {
   const getSyllabi = async () => {
     const output = await getSyllabiData();
 
+    console.log(`Can parse: ${await canParseSyllabus()}`)
+
     if (output != null) {
       setSyllabi((prev) => ({
         ...output,
@@ -178,6 +181,8 @@ export default function Generate() {
   };
 
   const parseSyllabus = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    
+
     setLoading(true);
 
     const parsed = await parseSyllabusData(e, currentClass);

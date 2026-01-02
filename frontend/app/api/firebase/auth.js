@@ -7,6 +7,8 @@ import {
   signInWithEmailAndPassword, signInWithPopup, updatePassword, reauthenticateWithPopup, EmailAuthProvider
 } from "firebase/auth";
 
+const MAX_PARSES = 2
+
 export const doCreateUserWithEmailAndPassword = async (email, password) => {
   const userCredential = await createUserWithEmailAndPassword(auth, email, password);
   const user = userCredential.user;
@@ -17,8 +19,17 @@ export const doCreateUserWithEmailAndPassword = async (email, password) => {
     email: user.email,
     displayName: user.displayName || 'Mysterious',
     photoURL: user.photoURL || 'https://example.com/default-photo.jpg',
+    parsesUsed: 0,
+    maxParses: MAX_PARSES,
   };
-  await setDoc(userRef, userData);
+
+  const docSnapshot = await getDoc(userRef);
+  if (!docSnapshot.exists()) {
+
+    //checks if user alr exists in firestore
+    //user data DNE, store it
+    await setDoc(userRef, userData);
+  }
 };
 
 export const doSignInWithEmailAndPassword = (email, password) => {
@@ -32,16 +43,21 @@ export const doSignInWithGoogle = async () => {
     const user = result.user;
 
     //store user data
-    const userRef = doc(collection(db, 'users'), user.uid);
+    const userRef = doc(db, 'users', user.uid);
+    console.log(user.uid)
     const userData = {
       email: user.email,
       displayName: user.displayName || 'Mysterious',
       photoURL: user.photoURL || 'https://example.com/default-photo.jpg',
+      parsesUsed: 0,
+      maxParses: MAX_PARSES,
     };
 
-    //checks if user alr exists in firestore
+    console.log(userData)
     const docSnapshot = await getDoc(userRef);
     if (!docSnapshot.exists()) {
+
+      //checks if user alr exists in firestore
       //user data DNE, store it
       await setDoc(userRef, userData);
     }

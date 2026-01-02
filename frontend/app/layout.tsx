@@ -3,8 +3,8 @@ import { ReactNode } from 'react';
 import { AuthProvider } from './contexts/authContext';
 
 export const metadata = {
-  title: 'Your App',
-  description: 'Some description',
+  title: 'Syllabeavs',
+  description: 'The AI Syllabus Parser',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

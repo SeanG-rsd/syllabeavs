@@ -1,5 +1,29 @@
-import { auth } from "@/app/api/firebase/firebase";
+import { auth, db } from "@/app/api/firebase/firebase";
 import { Assignment } from "@/app/types/assignment";
+import { doc, getDoc } from "firebase/firestore";
+
+export const canParseSyllabus = async () => {
+    const user = auth.currentUser;
+    if (!user) {
+      console.error("Not signed in!")
+      return null
+    }
+
+    try {
+
+      const userRef = doc(db, 'users', user.uid)
+      const docSnap = await getDoc(userRef)
+
+      if (docSnap.exists()) {
+
+        return docSnap.data().parsesUsed < docSnap.data().maxParses
+      }
+
+    } catch (e) {
+      console.error(e);
+      return false;
+    }
+}
 
 export const getSyllabiData = async () => {
     const user = auth.currentUser;

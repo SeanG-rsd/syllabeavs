@@ -16,6 +16,19 @@ export default function Home() {
         <Navigation />
       </motion.div>
       <Header />
+      <div className="h-[20%] flex justify-end items-end">
+        <a className="hover:text-orange-400" href="/support">
+          Support
+        </a>
+        <p className="mx-1.5"> | </p>
+        <a className="hover:text-orange-400" href="/support">
+          Privacy
+        </a>
+        <p className="mx-1.5"> | </p>
+        <a className="hover:text-orange-400" href="/support">
+          Terms
+        </a>
+      </div>
     </section>
   );
 }
