@@ -1,6 +1,6 @@
 import { auth, db } from "@/app/api/firebase/firebase";
 import { Assignment } from "@/app/types/assignment";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
 
 export const canParseSyllabus = async () => {
   const user = auth.currentUser;
@@ -101,6 +101,10 @@ export const parseSyllabusData = async (
     }
 
     const data = await response.json();
+
+    // increment parses used
+    const userRef = doc(db, 'users', user.uid)
+    await updateDoc(userRef, { parsesUsed: increment(1) });
 
     return JSON.parse(data.message);
   } catch (error: unknown) {

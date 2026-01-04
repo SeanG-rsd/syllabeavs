@@ -34,7 +34,7 @@ const Login: React.FC<LoginProps> = ({ register }) => {
             try {
                 await doSignInWithEmailAndPassword(email, password);
             } catch (error: any) {
-                setErrorMessage(error.message || "Failed to sign in.");
+                setErrorMessage(error.message || "Failed to sign in. Try Again.");
                 setIsSigningIn(false);
             }
         }

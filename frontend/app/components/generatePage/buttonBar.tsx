@@ -92,7 +92,7 @@ const ButtonBar: React.FC<ButtonBarProps> = (
                     </svg>
                 </div>
             </button>
-            <div className="flex justify-start">
+            {/* <div className="flex justify-start">
                 <div className="p-2 pl-4 pr-2 bg-white rounded-lg flex gap-3">
                     <p>Notify Me</p>
                     <label className="switch">
@@ -100,7 +100,7 @@ const ButtonBar: React.FC<ButtonBarProps> = (
                         <span className="slider round"></span>
                     </label>
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 };

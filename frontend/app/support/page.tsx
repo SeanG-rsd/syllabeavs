@@ -3,7 +3,7 @@
 import Navigation from "../components/Navigation";
 import { HiAnnotation } from "react-icons/hi";
 
-export default function Support() {
+function Support() {
     return (
         <div className="bg-[#1E1E1E] min-h-screen h-screen py-12">
             <Navigation />
@@ -88,3 +88,5 @@ export default function Support() {
         </div>
     );
 }
+
+//export default Support;

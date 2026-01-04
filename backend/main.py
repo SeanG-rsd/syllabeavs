@@ -31,41 +31,45 @@ app = FastAPI()
 client = OpenAI(api_key=api_key)
 
 syllabusQuery = """
-Look through the given syllabus and find out all the assignments, projects, tests, in-class activies, studios, textbook or document readings, recitations, and quizzes for the college course.
-For each of these pieces, find out the the name of the task, the status of the task, a simplified name for the class, how difficult the task will be on a scale from 1-5
-(1 being tasks that take less than 15 minutes to do and 5 being tests or something that takes more than 3 hours), and the due date in the format (mm/dd/yy). 
-Put each individual task in its own line. Include only the columns headers and the information, nothing else, not even quotation marks.
-All tasks can be given 1 of 4 statuses, "Not Started", "In Progress", "Blocked", or "Completed". For this course all tasks will be assigned "Not Started".
-For reference, Monday of Week 1 is 3/31/25 and Sunday of Week 1 is 4/6/25. The course lasts for 10 weeks, make sure to include every week's assignments
-Do not output any information except for the JSON formatted file. Output into the given JSON format below:
-+ Set the "class" field in each assignment to the exact class name provided earlier by the user input. Do not generate or infer a different name.
+Look through the provided syllabus and extract all assignments, projects, tests, activities, readings, and quizzes.
 
-Assignment JSON:
+### TEMPORAL ANCHOR
+- This is a 10-week course for Winter 2026.
+- Week 1, Monday is 01/05/2026.
+- Week 1, Sunday is 01/11/2026.
+- For relative dates (e.g., "Tuesday of Week 3"), calculate the exact date based on these anchors.
+
+### DATA REQUIREMENTS
+For each task, provide:
+1. task: The specific name of the assignment/reading.
+2. status: Always set to "Not Started".
+3. class: Use exactly "[CLASS_NAME_VAR]" (Do not infer).
+4. difficulty: Integer 1-5 (1: <15m, 3: ~1hr, 5: >3hrs/Exams).
+5. dueDate: String in mm/dd/yyyy format.
+
+### OUTPUT RULES
+- Return ONLY valid JSON. 
+- No markdown backticks, no introductory text, no "Column headers."
+- Structure must match the "Syllabus JSON" schema exactly.
+
+Syllabus JSON Schema:
 {
-    "task": string,
-    "status": string ("Not Started", "In Progress", or "Completed"),
-    "class": string,
-    "difficulty": int (1-5),
-    "dueDate": string (mm/dd/yyyy)
+  "class": string,
+  "assignments": [
+    {
+      "task": string,
+      "status": "Not Started",
+      "class": string,
+      "difficulty": number,
+      "dueDate": "mm/dd/yyyy"
+    }
+  ]
 }
-
-
-Syllabus JSON:
-{
-"class" : string
-"assignments" : [
-        Assignment JSON,
-        Assignment JSON,
-        ...
-    ]
-}
-
-NO QUOTATION MARKS
 """
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["https://syllabeavs.com"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -76,7 +80,7 @@ GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 REDIRECT_URI = "http://localhost:8000/oauth2callback"
 
 MAX_TOKENS = 10000 
-MODEL_NAME = "gpt-4o"
+MODEL_NAME = "gpt-4o-mini"
 
 async def verify_token(request: Request):
     auth_header = request.headers.get("Authorization")

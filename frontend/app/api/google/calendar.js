@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv';
 import { auth } from '../firebase/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/firebase';
 import { userInfo } from 'os';
 
@@ -90,6 +90,20 @@ export const isAuthorizedForCalendar = async () => {
 
         return false;
     }
+}
+
+export const sendSuggestions = async (suggestion) => {
+    const user = auth.currentUser;
+
+    if (!user) {
+        alert("Please sign in!")
+        return;
+    }
+
+    await addDoc(collection(db, 'suggestions'), {
+      content: suggestion,
+      createdAt: new Date().toISOString()
+    });
 }
 
 // export const connectGoogleSheets = async (assignments, currentClass) => {
