@@ -16,6 +16,7 @@ from firebase_admin import firestore, db as realtimedb
 from firebase_admin import credentials, initialize_app, auth
 import json
 from datetime import datetime, timezone
+import tiktoken
 
 load_dotenv()
 api_key = os.getenv("API_KEY")
@@ -73,6 +74,9 @@ app.add_middleware(
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 REDIRECT_URI = "http://localhost:8000/oauth2callback"
+
+MAX_TOKENS = 10000 
+MODEL_NAME = "gpt-4o"
 
 async def verify_token(request: Request):
     auth_header = request.headers.get("Authorization")
@@ -211,6 +215,10 @@ async def update_syllabi(request: Request, user_data: dict = Depends(verify_toke
         assignments = data["assignments"]
         db.collection("users").document(user_id).collection("syllabi").document(current_class).set({"assignments": assignments})
 
+def count_tokens(text: str, model: str) -> int:
+    encoding = tiktoken.encoding_for_model(model)
+    return len(encoding.encode(text))
+
 @app.post("/input")
 async def recieve_syllabus(request: Request, file: UploadFile, user_data: dict = Depends(verify_token)):
     name = request.headers.get("ClassName")
@@ -226,7 +234,22 @@ async def recieve_syllabus(request: Request, file: UploadFile, user_data: dict =
     else:
         raise HTTPException(status_code=400, detail="Unsupported file type")
     
-    parsed = json.loads(parse_syllabus(text, name))
+    if (len(text) > 30000):
+        raise HTTPException(status_code=400, detail="File content is too large. Try removing uneccesary pages.")
+    
+    num_tokens = count_tokens(text, MODEL_NAME)
+    print(num_tokens)
+
+    if num_tokens > MAX_TOKENS:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Syllabus is too long. Try removing uneccesary pages."
+        )
+    
+    syll = parse_syllabus(text, name)
+    print(syll)
+    
+    parsed = json.loads(syll)
 
     for x in parsed["assignments"]:
         x["class"] = name
@@ -250,7 +273,7 @@ def extract_text_from_pdf(contents: bytes) -> str:
 
 def parse_syllabus(text, className):
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model=MODEL_NAME,
         messages=[
             {
                 "role": "user",

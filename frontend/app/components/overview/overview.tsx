@@ -1,6 +1,7 @@
 import { Assignment } from "@/app/types/assignment";
 import NextAssignments from "./nextAssignments";
 import OverviewTotalProgress from "./progressChart";
+import NoAssignments from "../generatePage/noAssignments";
 
 interface OverviewProps {
     syllabi: {}
@@ -8,6 +9,15 @@ interface OverviewProps {
 }
 
 const Overview: React.FC<OverviewProps> = ({syllabi, update}) => {
+    var count = 0;
+    for (var syllabus in syllabi) {
+        count += syllabus.length
+    }
+
+    if (count == 0) {
+        return <NoAssignments/>
+    }
+
     return (
         <div className="w-full flex items-center mt-4">
             <div className="flex flex-col w-5/12 items-center">

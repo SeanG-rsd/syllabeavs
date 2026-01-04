@@ -1,25 +1,10 @@
 import { useState } from "react";
 import AddClassModal from "./addClassModal";
-import { canParseSyllabus } from "@/app/api/syllabus/syllabi";
 
-interface NoClassesProps {
-    addClass: (className: string) => void;
-}
-
-const NoClasses: React.FC<NoClassesProps> = ({addClass}) => {
-    const [showModal, setShowModal] = useState(false);
-    const [canParse, setCanParse] = useState(false);
-    
-        const toggleModal = async () => {
-            setCanParse(await canParseSyllabus() ?? false)
-            setShowModal(!showModal);
-        };
+const NoAssignments = () => {
 
     return (
-        <div>
-            {showModal ? <AddClassModal addClass={addClass} closeModal={toggleModal} canParse={canParse}></AddClassModal> : <div/>}
-            <button 
-             onClick={toggleModal}
+        <div
              className="group hover:cursor-pointer rounded-lg  border border-dashed border-slate-100 transition-all duration-200">
                 <div className="flex h-fit items-center justify-center">
                     <div className="h-full p-24 space-y-10 rounded-xl">
@@ -50,14 +35,13 @@ const NoClasses: React.FC<NoClassesProps> = ({addClass}) => {
                             </svg>
                         </div>
                         <p className="text-center bg-gradient-to-r from-red-500 to-orange-500 inline-block text-transparent bg-clip-text text-xl font-semibold">
-                            Looks like you haven't added any classes yet...
+                            Looks like you don't have any assignments yet...
                             lame...
                         </p>
                     </div>
                 </div>
-            </button>
         </div>
     );
 };
 
-export default NoClasses;
+export default NoAssignments;

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import AddClassModal from "./addClassModal";
 import DeleteClassModal from "./deleteClassModal";
+import { canParseSyllabus } from "@/app/api/syllabus/syllabi";
 
 interface SideBarProps {
     syllabi: {};
@@ -26,9 +27,11 @@ const SideBar: React.FC<SideBarProps> = (
     const [addClassModal, setAddClassModal] = useState(false);
     const [deleteClassModal, setDeleteClassModal] = useState(false);
     const [deleteClassName, setDeleteClass] = useState("");
+    const [canParse, setCanParse] = useState(false);
 
-    const toggleAddClassModal = () => {
-        setAddClassModal(false);
+    const toggleAddClassModal = async () => {
+        setCanParse(await canParseSyllabus() ?? false)
+        setAddClassModal(!addClassModal);
     };
 
     const toggleDeleteClassModal = () => {
@@ -150,7 +153,7 @@ const SideBar: React.FC<SideBarProps> = (
                         ? <div />
                         : <div className="w-full bg-white h-1" />}
                     <button
-                        onClick={() => setAddClassModal(true)}
+                        onClick={toggleAddClassModal}
                         className="group flex justify-start items-center rounded-lg py-2 px-3 hover:cursor-pointer hover:bg-[#292929]"
                     >
                         <h1 className="text-white">Add a new class</h1>
@@ -173,6 +176,7 @@ const SideBar: React.FC<SideBarProps> = (
                         <AddClassModal
                             closeModal={toggleAddClassModal}
                             addClass={addClass}
+                            canParse={canParse}
                         />
                     )}
                     {deleteClassModal && (
