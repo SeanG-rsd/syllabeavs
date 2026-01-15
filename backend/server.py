@@ -21,7 +21,7 @@ import tiktoken
 load_dotenv()
 api_key = os.getenv("API_KEY")
 
-cred_path = os.getenv("FIREBASE_CREDENTIAL_PATH")
+cred_path = json.loads(os.getenv("FIREBASE_CREDENTIAL_PATH"))
 cred = credentials.Certificate(cred_path)
 initialize_app(cred)
 
@@ -69,7 +69,7 @@ Syllabus JSON Schema:
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://syllabeavs.study"],
+    allow_origins=["https://syllabeavs.study", "https://www.syllabeavs.study"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -77,7 +77,10 @@ app.add_middleware(
 
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
-REDIRECT_URI = "http://localhost:8000/oauth2callback"
+
+REDIRECT_URI = os.getenv("REDIRECT_URI", "http://localhost:8000/oauth2callback")
+
+FRONTEND_SUCCESS_URL = os.getenv("FRONTEND_SUCCESS_URL", "http://localhost:3000/success")
 
 MAX_TOKENS = 10000 
 MODEL_NAME = "gpt-4o-mini"
@@ -97,7 +100,7 @@ async def verify_token(request: Request):
 @app.get("/oauth2callback")
 async def oauth2callback(request: Request):
     code = request.query_params.get("code")
-    return RedirectResponse(url=f"http://localhost:3000/success?code={code}")
+    return RedirectResponse(url=f"{FRONTEND_SUCCESS_URL}?code={code}")
 
 @app.post("/store_google_tokens")
 async def setup_calendar(request: Request):
@@ -118,7 +121,7 @@ async def setup_calendar(request: Request):
             }
         },
         scopes=["https://www.googleapis.com/auth/tasks"],
-        redirect_uri="http://localhost:8000/oauth2callback"
+        redirect_uri=REDIRECT_URI
     )
 
     flow.fetch_token(code=code)
