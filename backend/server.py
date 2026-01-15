@@ -7,7 +7,6 @@ from PyPDF2 import PdfReader
 from io import BytesIO
 import os
 from dotenv import load_dotenv
-import io
 import logging
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
@@ -17,11 +16,33 @@ from firebase_admin import credentials, initialize_app, auth
 import json
 from datetime import datetime, timezone
 import tiktoken
+import sys
 
 load_dotenv()
 api_key = os.getenv("API_KEY")
 
-cred_path = json.loads(os.getenv("FIREBASE_CREDENTIAL_PATH"))
+logging.basicConfig(
+    stream=sys.stdout,
+    level=logging.INFO,
+    format='%(levelname)s: %(message)s'
+)
+
+logger = logging.getLogger(__name__)
+
+logger.info("load cred_path")
+secret = os.getenv('FIREBASE_SERVICE_ACCOUNT')
+secret = secret.encode("utf-8").decode("utf-8-sig")
+if secret:
+    # Log only the length or the first 4 characters
+    print(f"DEBUG: Firebase Key loaded (Length: {len(secret)}, Starts with: {secret[:10]}...)")
+else:
+    print("ERROR: Firebase Key is missing!")
+try:
+    cred_path = json.loads(secret)
+    print("SUCCESS: Firebase JSON is valid.")
+except Exception as e:
+    print(f"FAILURE: Firebase JSON is invalid: {e}")
+logger.info("loaded")
 cred = credentials.Certificate(cred_path)
 initialize_app(cred)
 
@@ -167,9 +188,9 @@ async def add_all_to_calendar(request: Request, user_data: dict = Depends(verify
 
             google_due = dt.isoformat().replace('+00:00', 'Z')
             task = {
-                'title': assignment["task"],
+                'title': assignment['task'],
                 'due': google_due,
-                'notes': f"Difficulty: {assignment["difficulty"]}"
+                'notes': f"Difficulty: {assignment['difficulty']}"
             }
 
             service.tasks().insert(tasklist='@default', body=task).execute()
@@ -228,6 +249,9 @@ def count_tokens(text: str, model: str) -> int:
 
 @app.post("/input")
 async def recieve_syllabus(request: Request, file: UploadFile, user_data: dict = Depends(verify_token)):
+    if (user_data == None):
+        return {"message": json.dumps({})}
+
     name = request.headers.get("ClassName")
     contents = await file.read()
     filename = file.filename.lower()
@@ -261,9 +285,8 @@ async def recieve_syllabus(request: Request, file: UploadFile, user_data: dict =
     for x in parsed["assignments"]:
         x["class"] = name
    
-    if (user_data != None):
-        user_id = user_data["uid"]
-        db.collection("users").document(user_id).collection("syllabi").document(name).set({"assignments": parsed["assignments"], "addedToCalendar": False})
+    user_id = user_data["uid"]
+    db.collection("users").document(user_id).collection("syllabi").document(name).set({"assignments": parsed["assignments"], "addedToCalendar": False})
 
     return {"message": json.dumps(parsed["assignments"])}
 

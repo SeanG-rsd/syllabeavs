@@ -4,6 +4,8 @@ import { addDoc, collection, doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/firebase';
 import { userInfo } from 'os';
 
+const API_BASE_URL = "api.syllabeavs.study"
+
 dotenv.config();
 
 export const connectGoogleCalendar = async (assignments, currentClass) => {
@@ -15,7 +17,7 @@ export const connectGoogleCalendar = async (assignments, currentClass) => {
     if (!authorized) {
 
         const CLIENT_ID = "707127499604-5bqcqt8u06ppo3us5sb3b613c7fv8vpp.apps.googleusercontent.com";
-        const REDIRECT_URI = "http://localhost:8000/oauth2callback";
+        const REDIRECT_URI = `http://${API_BASE_URL}/oauth2callback`;
         const SCOPES = ["https://www.googleapis.com/auth/tasks", "https://www.googleapis.com/auth/sheets"];
 
         sessionStorage.setItem("firebaseUID", userUid);
@@ -39,7 +41,7 @@ export const connectGoogleCalendar = async (assignments, currentClass) => {
         if (!isAdded) {
 
             console.log("ADD TASKS");
-            await fetch("http://localhost:8000/add_events", {
+            await fetch(`http://${API_BASE_URL}/add_events`, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${token}`,

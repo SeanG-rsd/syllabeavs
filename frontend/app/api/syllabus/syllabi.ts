@@ -2,6 +2,8 @@ import { auth, db } from "@/app/api/firebase/firebase";
 import { Assignment } from "@/app/types/assignment";
 import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
 
+const API_BASE_URL = "api.syllabeavs.study"
+
 export const canParseSyllabus = async () => {
   const user = auth.currentUser;
   if (!user) {
@@ -32,7 +34,7 @@ export const getSyllabiData = async () => {
   const token = await user.getIdToken();
 
   try {
-    const response = await fetch("http://localhost:8000/syllabi", {
+    const response = await fetch(`https://${API_BASE_URL}/syllabi`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -79,7 +81,7 @@ export const parseSyllabusData = async (
 
   try {
     //setLoading(true);
-    const response = await fetch("http://localhost:8000/input", {
+    const response = await fetch(`https://${API_BASE_URL}/input`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -137,7 +139,7 @@ export const updateAssignmentStatus = async (
   const token = await user.getIdToken();
 
   try {
-    await fetch("http://localhost:8000/update", {
+    await fetch(`https://${API_BASE_URL}/update`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -182,7 +184,7 @@ export const updateAssignmentDate = async (
   const token = await user.getIdToken();
 
   try {
-    await fetch("http://localhost:8000/update", {
+    await fetch(`https://${API_BASE_URL}/update`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -211,7 +213,7 @@ export const updateSyllabus = async (
   const token = await user.getIdToken();
 
   try {
-    await fetch("http://localhost:8000/update", {
+    await fetch(`https://${API_BASE_URL}/update`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -237,7 +239,7 @@ export const deleteSyllabus = async (className: string) => {
   const token = await user.getIdToken();
 
   try {
-    await fetch("http://localhost:8000/delete", {
+    await fetch(`https://${API_BASE_URL}/delete`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
