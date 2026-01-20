@@ -27,9 +27,7 @@ export default function Home() {
           <Navigation />
         </motion.div>
         <Header />
-
-        <SubscribeModal check={true}/>
-
+        
         <div className="h-[20%] flex justify-end items-end">
           <button
             className="hover:text-orange-400"

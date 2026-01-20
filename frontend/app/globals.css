@@ -155,7 +155,7 @@ hr {
     border-width: 2px;
   }
 
-  @theme inline {
+  @theme inline { 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -194,6 +194,21 @@ hr {
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Define Keyframes */
+  @keyframes star-movement-bottom {
+    0% { transform: translateX(0%); opacity: 1; }
+    100% { transform: translateX(-100%); opacity: 0.5; }
+  }
+
+  @keyframes star-movement-top {
+    0% { transform: translateX(0%); opacity: 1; }
+    100% { transform: translateX(100%); opacity: 0.5; }
+  }
+
+  /* Define Animation Utilities */
+  --animate-star-movement-bottom: star-movement-bottom 6s linear infinite alternate;
+  --animate-star-movement-top: star-movement-top 6s linear infinite alternate;
 }
 
   .dark {

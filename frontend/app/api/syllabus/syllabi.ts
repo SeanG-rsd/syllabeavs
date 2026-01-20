@@ -2,7 +2,8 @@ import { auth, db } from "@/app/api/firebase/firebase";
 import { Assignment } from "@/app/types/assignment";
 import { doc, getDoc, updateDoc, increment } from "firebase/firestore";
 
-const API_BASE_URL = "api.syllabeavs.study"
+//const API_BASE_URL = "api.syllabeavs.study"
+const API_BASE_URL = "localhost:8000"
 
 export const canParseSyllabus = async () => {
   const user = auth.currentUser;
