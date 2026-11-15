@@ -43,25 +43,6 @@
 //                     </div>
 
 //                     <div className="w-[60%]">
-//                         {/* User information & Account Settings */}
-//                         <div className="border-green-400 border-4 h-fit rounded-4xl p-4 flex flex-col items-start gap-1">
-//                             <p className="text-white text-2xl font-semibold">
-//                                 Billing & Subscriptions
-//                             </p>
-//                             <a className="border-blue-500 border-2 rounded-2xl p-3 px-12 my-3 w-fit bg-orange-400 font-semibold">
-//                                 Manage Subscription
-//                             </a>
-//                             <a className="w-full text-white">
-//                                 Refund Policy
-//                             </a>
-//                             <a className="w-full text-white">
-//                                 Update Payment Method
-//                             </a>
-//                             <a className="w-full text-white">
-//                                 View Invoice History
-//                             </a>
-//                         </div>
-
 //                         {/* Getting Started */}
 //                         <div>
 //                         </div>

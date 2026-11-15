@@ -6,7 +6,6 @@ import Signin from "./components/auth/login";
 import { motion } from "motion/react";
 import { useState } from "react";
 import SuggestionModal from "./components/auth/suggestionModal";
-import SubscribeModal from "./components/subscription/subscribeModal";
 
 export default function Home() {
   const [suggestionModal, setSuggestionModal] = useState(false);

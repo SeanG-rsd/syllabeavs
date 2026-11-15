@@ -1,7 +1,6 @@
 import { canParseSyllabus } from "@/app/api/syllabus/syllabi";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
-import SubscribeModal from "../subscription/subscribeModal";
 
 interface AddClassModalProps {
     addClass: (className: string) => void;
@@ -18,8 +17,6 @@ const AddClassModal: React.FC<AddClassModalProps> = ({
 
     const [input, setInput] = useState("");
 
-    const [subscribeModal, setSubscribeModal] = useState(false);
-
     const submit = () => {
         if (input != "") {
             addClass(input);
@@ -34,10 +31,6 @@ const AddClassModal: React.FC<AddClassModalProps> = ({
                 setShake(false);
             }, 500);
         }
-    };
-
-    const onCloseSubscribeModal = () => {
-        setSubscribeModal(false);
     };
 
     return (
@@ -108,24 +101,12 @@ const AddClassModal: React.FC<AddClassModalProps> = ({
                                             You have use up all of your free
                                             Syllabi!
                                         </h2>
-                                        <div className="flex px-3 mt-4 justify-around">
-                                            <div className="flex gap-4">
-                                                <button
-                                                    onClick={closeModal}
-                                                    className="bg-gray-500 text-black py-3 px-5 rounded-full font-semibold hover:bg-gray-400 hover:cursor-pointer hover:scale-105 transition duration-200"
-                                                >
-                                                    Exit
-                                                </button>
-                                            </div>
+                                        <div className="flex px-3 mt-4 justify-center">
                                             <button
-                                                onClick={() => setSubscribeModal(true)}
-                                                className="group bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 rounded-full p-[1.5px] hover:cursor-pointer hover:scale-105 hover:from-yellow-500 hover:to-red-500 transition duration-200"
+                                                onClick={closeModal}
+                                                className="bg-gray-500 text-black py-3 px-5 rounded-full font-semibold hover:bg-gray-400 hover:cursor-pointer hover:scale-105 transition duration-200"
                                             >
-                                                <div className="h-full w-full flex items-center justify-center py-3 px-12 rounded-full bg-[#292929]">
-                                                    <h2 className="text-white font-semibold">
-                                                        Subscribe
-                                                    </h2>
-                                                </div>
+                                                Exit
                                             </button>
                                         </div>
                                     </div>
@@ -134,13 +115,6 @@ const AddClassModal: React.FC<AddClassModalProps> = ({
                     </motion.div>
                 </AnimatePresence>
             </div>
-
-            {subscribeModal
-                ? (
-                    <SubscribeModal onClose={onCloseSubscribeModal}>
-                    </SubscribeModal>
-                )
-                : <></>}
         </>
     );
 };

@@ -12,7 +12,6 @@ import Link from "next/link";
 import { IoClose } from "react-icons/io5";
 import { auth } from "@/app/api/firebase/firebase";
 import DeleteAccountModal from "./confirmDeleteAccountModal";
-import SubscribeModal from "../subscription/subscribeModal";
 
 interface ProfileProps {
     close: () => void;
@@ -26,8 +25,6 @@ const Profile: React.FC<ProfileProps> = ({ close, signIn }) => {
     const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
     const [deleteProfileModal, setDeleteProfileModal] = useState(false);
-
-    const [subscribeModal, setSubscribeModal] = useState(false);
 
     const { currentUser, userLoggedIn, isEmailUser, isGoogleUser } = useAuth();
 
@@ -83,12 +80,6 @@ const Profile: React.FC<ProfileProps> = ({ close, signIn }) => {
                 )
                 : <div />}
 
-            {subscribeModal
-                ? (
-                    <SubscribeModal onClose={() => setSubscribeModal(false)}>
-                    </SubscribeModal>
-                )
-                : <></>}
             <main className="w-full h-screen flex self-center place-content-center place-items-center">
                 <div className="w-96 bg-white text-gray-600 space-y-5 p-4 shadow-xl border rounded-xl">
                     <div className="flex items-center justify-between mt-2">
@@ -121,12 +112,6 @@ const Profile: React.FC<ProfileProps> = ({ close, signIn }) => {
                         }`}
                     >
                         {isSigningOut ? "Signing Out..." : "Sign Out"}
-                    </button>
-                    <button
-                        onClick={() => setSubscribeModal(true)}
-                        className={`w-full px-4 py-2 text-white font-medium rounded-lg bg-orange-300 hover:bg-orange-400 hover:shadow-xl transition duration-300`}
-                    >
-                        Manage Subscription
                     </button>
                     <button
                         onClick={onDeleteAccount}

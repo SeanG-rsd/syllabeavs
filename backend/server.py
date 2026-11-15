@@ -17,7 +17,6 @@ import json
 from datetime import datetime, timezone
 import tiktoken
 import sys
-import stripe
 
 load_dotenv()
 api_key = os.getenv("API_KEY")
@@ -31,8 +30,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 secret = os.getenv('FIREBASE_SERVICE_ACCOUNT')
-
-stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
 try:
     if secret.startswith('{'): # It's a JSON string
@@ -102,7 +99,6 @@ GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 REDIRECT_URI = os.getenv("REDIRECT_URI", "http://localhost:8000/oauth2callback")
 
 FRONTEND_SUCCESS_URL = os.getenv("FRONTEND_SUCCESS_URL", "http://localhost:3000/success")
-FRONTEND_URL = os.getenv("FRONTEND_URL", "https://localhost:3000")
 
 MAX_TOKENS = 10000 
 MODEL_NAME = "gpt-4o-mini"
@@ -325,57 +321,3 @@ def parse_syllabus(text, className):
     fixed_json = raw.replace("'", '"')
 
     return fixed_json
-
-async def check_subscription(user_id: str):
-    doc = db.collection("users").document(user_id).get()
-    if not doc.exists or doc.to_dict().get("plan") != "pro":
-        raise HTTPException(status_code=403, detail="Pro subscription required")
-
-@app.post("/create-checkout-session")
-async def create_checkout(request: Request, user_data: dict = Depends(verify_token)):
-    if (user_data is None):
-        return
-
-    try:
-        checkout_session = stripe.checkout.Session.create(
-            line_items=[{
-                'price': 'price_H5ggYxyzabcadkfjl', # From Stripe Dashboard
-                'quantity': 1,
-            }],
-            mode='subscription',
-            success_url=FRONTEND_SUCCESS_URL + "?session_id={CHECKOUT_SESSION_ID}",
-            cancel_url=FRONTEND_URL + "/generate",
-            client_reference_id=user_data["uid"], # Link this to your Firebase User
-        )
-        return {"url": checkout_session.url}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    
-@app.post("/webhook")
-async def stripe_webhook(request: Request):
-    payload = await request.body()
-    sig_header = request.headers.get("stripe-signature")
-    endpoint_secret = os.getenv("STRIPE_WEBHOOK_SECRET")
-
-    try:
-        # VALIDATE the signature to ensure this actually came from Stripe
-        event = stripe.Webhook.construct_event(
-            payload, sig_header, endpoint_secret
-        )
-    except ValueError:
-        raise HTTPException(status_code=400, detail="Invalid payload")
-    except stripe.error.SignatureVerificationError:
-        raise HTTPException(status_code=400, detail="Invalid signature")
-
-    # Handle the successful payment
-    if event['type'] == 'checkout.session.completed':
-        session = event['data']['object']
-        uid = session['client_reference_id']
-        
-        # Update Firestore
-        db.collection("users").document(uid).update({
-            "plan": "pro",
-            "subscription_id": session['subscription']
-        })
-
-    return {"status": "success"}
