@@ -4,7 +4,7 @@ import { addDoc, collection, doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/firebase';
 import { userInfo } from 'os';
 
-const API_BASE_URL = "api.syllabeavs.study"
+const API_BASE_URL = "api.syllabeavs.com"
 
 dotenv.config();
 

@@ -55,7 +55,7 @@ export default function Navigation() {
       <div className="flex justify-between">
         <Link href="../">
           <div className="flex justify center items-center">
-            <img src="/syllabeavs_logo.png" alt="logo" className="h-12" />
+            <img src="/logo.png" alt="logo" className="h-12 mr-3" />
             <h1 className="text-slate-100 font-bold text-xl">
               Sylla
               <span className="bg-gradient-to-r from-red-500 to-orange-500 inline-block text-transparent bg-clip-text">

@@ -90,7 +90,7 @@ Syllabus JSON Schema:
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://syllabeavs.study", "https://www.syllabeavs.study", "http://localhost:3000"],
+    allow_origins=["https://syllabeavs.com", "https://www.syllabeavs.com", "http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
