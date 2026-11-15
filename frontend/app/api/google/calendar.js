@@ -75,9 +75,13 @@ export const isAlreadyAddedToCalendar = async (className) => {
 };
 
 export const isAuthorizedForCalendar = async () => {
+    const user = auth.currentUser;
+    if (!user) {
+        console.error("User not authenticated.");
+        return false;
+    }
 
-    const userUid = auth.currentUser.uid;
-    const userRef = doc(db, "users", userUid);
+    const userRef = doc(db, "users", user.uid);
 
     const userSnap = await getDoc(userRef);
 

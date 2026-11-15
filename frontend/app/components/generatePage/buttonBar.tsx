@@ -22,19 +22,19 @@ const ButtonBar: React.FC<ButtonBarProps> = (
     const [loaded, setLoaded] = useState(false);
 
     useEffect(() => {
-        if (!loaded) {
-            loadBar();
-        }
-    });
+        loadBar();
+    }, [currentClass]);
 
     const loadBar = async () => {
-        var isAdded = await isAlreadyAddedToCalendar(currentClass);
-        setCalendar(isAdded);
-
-        var isConnected = await isAuthorizedForCalendar();
-        setConnected(isConnected);
-
-        setLoaded(true);
+        setLoaded(false);
+        try {
+            setCalendar(await isAlreadyAddedToCalendar(currentClass));
+            setConnected(await isAuthorizedForCalendar());
+        } catch (error) {
+            console.error("Couldn't load Google Calendar status:", error);
+        } finally {
+            setLoaded(true);
+        }
     };
 
     const addToCalendar = async () => {
