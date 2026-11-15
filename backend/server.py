@@ -29,19 +29,22 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-secret = os.getenv('FIREBASE_SERVICE_ACCOUNT')
+# Either the service-account JSON itself (Fly secret) or a path to the JSON file (local .env).
+# Strip any leading byte-order mark: the Fly secret was saved with one.
+secret = (os.getenv('FIREBASE_SERVICE_ACCOUNT') or "").lstrip("﻿").strip()
 
 try:
     if secret.startswith('{'): # It's a JSON string
         cred_path = json.loads(secret)
     else: # It's a file path
-        with open(secret) as f:
+        with open(secret, encoding="utf-8-sig") as f:
             cred_path = json.loads(f.read())
-            
+
     cred = credentials.Certificate(cred_path)
     initialize_app(cred)
 except Exception as e:
     logger.error(f"Firebase Initialization Error: {e}")
+    raise
 
 db = firestore.client()
 app = FastAPI()
